@@ -109,3 +109,13 @@ class CapabilityTests(unittest.TestCase):
         d=self.store.snapshot();self.store.save({**d,'selection':{'provider':'openai'}})
         config=tomlkit.parse((self.root/'config.toml').read_text())
         self.assertEqual(list(config['desktop']['enabled-reasoning-efforts']),['low'])
+
+    def test_deepseek_template_and_reasoning_presets(self):
+        from backend.capabilities import capability
+        template=next(t for t in self.store.snapshot()['templates'] if t['id']=='deepseek')
+        self.assertEqual(template['baseUrl'],'https://api.deepseek.com')
+        self.assertEqual(template['model'],'')
+        for model in ['deepseek-flash','deepseek-v4-pro']:
+            self.assertEqual(capability(template['baseUrl'],model,{}),{'reasoning_levels':['low','high','max'],'default_reasoning_level':'high'})
+            self.assertIsNone(capability('https://third-party.example/v1',model,{}))
+        self.assertIsNone(capability(template['baseUrl'],'deepseek-chat',{}))

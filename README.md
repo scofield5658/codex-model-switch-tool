@@ -137,6 +137,7 @@ codex plugin add codex-model-switch-tool@model-switch-plugin
 
 | 接入 | 模型 ID | 推理档位 | 默认值 |
 | --- | --- | --- | --- |
+| DeepSeek | `deepseek-flash`、`deepseek-v4-pro` | low / high / max | high |
 | Moonshot 开放平台 | `kimi-k3` | low / high / max | max |
 | Kimi Code | `k3`、`k3-256k`、`k3.1-pro`、`k3.1-pro-highspeed` | low / high / max | high |
 | Kimi Code | `kimi-for-coding` | low / high / max | max |
@@ -162,3 +163,9 @@ codex plugin add codex-model-switch-tool@model-switch-plugin
 这里的“映射”是服务端协议兼容：Codex 原样发送 `reasoning.effort`，插件不转换请求，也不会把所有厂商的同名档位视为相同计算量。BigModel 的 [Responses 文档](https://docs.bigmodel.cn/cn/guide/develop/responses/introduction) 描述了服务端档位转换；内置菜单采用其 Codex 专用示例。若自定义服务只接受 `thinking.type` 或 token budget，需由该服务提供 Responses 兼容层，不能在插件里仅改名称来实现转换。
 
 能力写入插件生成的模型目录。已有 `model_catalog_json` 用户文件或 `model_catalog_url` 保持原样，菜单能力须在该外部目录维护。生成目录需要的档位会补充到 `desktop.enabled-reasoning-efforts`；切回内置 GPT 时恢复之前的字段，保留其他 desktop 设置和之后的外部修改。宿主版本或账号可见性设置仍可能影响菜单展示。
+
+### DeepSeek 接入
+
+DeepSeek 已原生支持 Responses，预置地址为 `https://api.deepseek.com`。添加模板后填写 Key、刷新模型列表，再选择 `deepseek-flash` 或 `deepseek-v4-pro`；模型、Key 和健康测试仍不预填。两个模型的推理预设采用官方 Codex 示例：`low / high / max`，默认 `high`。其他模型 ID 或第三方转发地址不自动套用这些能力。
+
+依据：[DeepSeek Responses 兼容说明](https://api-docs.deepseek.com/guides/responses_api/)、[官方 Codex 接入](https://api-docs.deepseek.com/quick_start/agent_integrations/codex/)（2026-11-12 核对）。支持流式响应及函数调用，但不是全部 OpenAI API 能力的等价实现：不支持服务端会话存储，推理摘要不会生成。本模板只提供现有插件范围内的接入和推理声明，不启用 Alpha Search、不修改登录方式，也不声明图片输入等额外能力。尚未使用真实 DeepSeek Key 验证付费请求。

@@ -361,7 +361,7 @@ test('official reasoning levels, per-model overrides and raw JSON stay synchroni
 test('BigModel is alongside existing templates and does not prefill a model',async({page})=>{
  await page.goto('http://127.0.0.1:43187');
  await page.locator('#add').click();
- await expect(page.locator('#template option')).toHaveCount(5);
+ await expect(page.locator('#template option')).toHaveCount(6);
  await page.locator('#template').selectOption('bigmodel-cn');
  await page.locator('#confirm-add').click();
  const card=page.locator('[data-id="bigmodel-cn"]');
@@ -370,5 +370,22 @@ test('BigModel is alongside existing templates and does not prefill a model',asy
  await expect(card.locator('[data-reasoning="effort"]')).toBeDisabled();
  await card.locator('[data-field="model"]').fill('glm-5.3');
  await expect(card.locator('[data-reasoning="effort"] option')).toHaveText(['使用模型默认值 · max','low','high','max']);
+ await page.getByRole('button',{name:'重置',exact:true}).click();
+});
+
+test('DeepSeek template keeps inputs blank and offers documented reasoning levels after model selection',async({page})=>{
+ await page.goto('http://127.0.0.1:43187');
+ await page.locator('#add').click();
+ await page.locator('#template').selectOption('deepseek');
+ await page.locator('#confirm-add').click();
+ const card=page.locator('[data-id="deepseek"]');
+ await expect(card.locator('[data-field="baseUrl"]')).toHaveValue('https://api.deepseek.com');
+ await expect(card.locator('[data-field="model"]')).toHaveValue('');
+ await expect(card.locator('[data-field="key"]')).toHaveValue('');
+ for(const model of ['deepseek-flash','deepseek-v4-pro']){
+  await card.locator('[data-field="model"]').fill(model);
+  await expect(card.locator('[data-reasoning="effort"] option')).toHaveText(['使用模型默认值 · high','low','high','max']);
+ }
+ await expect(card.locator('[data-action="health"]')).toBeDisabled();
  await page.getByRole('button',{name:'重置',exact:true}).click();
 });

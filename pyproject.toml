@@ -1,6 +1,6 @@
 [project]
 name = "codex-model-switch-tool"
-version = "0.1.4"
+version = "0.1.5"
 description = "Python backend for the Codex custom model settings plugin"
 requires-python = "==3.12.13"
 authors = [{ name = "guoz5658", email = "guoz5658@outlook.com" }]

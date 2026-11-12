@@ -28,7 +28,7 @@ async function backend(command,args={}){
 function result(data){return {content:[],structuredContent:data};}
 function handler(command){return async({payload}={})=>{try{return result(await backend(command,payload?JSON.parse(payload):{}));}catch(e){const code=messages[e.code]?e.code:(e instanceof SyntaxError?'requestJson':messageCodes.get(e.message)||'operationFailed');return {isError:true,structuredContent:{errorCode:code,errorParams:e.params||{}},content:[{type:'text',text:messages[code]['zh-Hans'].replace(/\{(\w+)\}/g,(_,key)=>String(e.params?.[key]??''))}]};}};}
 async function start(){
- const server=new McpServer({name:'codex-model-switch-tool',version:'0.1.4'});
+ const server=new McpServer({name:'codex-model-switch-tool',version:'0.1.5'});
  const uri='ui://model-switcher/settings';
  // Opening the page must not wait for a first-time Python download or configuration read.
  registerAppTool(server,'provider_manager',{title:'自定义模型配置',description:'打开本地自定义模型配置界面，配置地址、凭证和默认模型。已有密钥不向模型返回。',inputSchema:{},annotations:{readOnlyHint:true},_meta:{ui:{resourceUri:uri},'openai/ui':{entrypoints:[{type:'global'}]}}},async()=>result({}));

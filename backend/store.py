@@ -32,6 +32,7 @@ MODEL_KEYS = {'model_reasoning_effort', 'model_reasoning_summary', 'model_contex
 TOP_KEYS = MODEL_KEYS | {'model', 'model_provider', 'model_catalog_json'}
 PROVIDER_KEYS = {'wire_api', 'request_max_retries', 'stream_max_retries', 'stream_idle_timeout_ms', 'http_headers', 'model_catalog_url', 'supports_websockets'}
 DEFAULTS = {
+    'deepseek': ('DeepSeek', 'https://api.deepseek.com', ''),
     'kimi-code-plan-cn': ('Kimi Code', 'https://api.kimi.com/coding/v1', 'k3'),
     'moonshotai-cn': ('Moonshot', 'https://api.moonshot.cn/v1', 'kimi-k3'),
     'bigmodel-cn': ('BigModel（智谱中国）', 'https://open.bigmodel.cn/api/v1', ''),
