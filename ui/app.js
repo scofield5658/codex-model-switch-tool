@@ -15,6 +15,7 @@ function changed(p){
  document.querySelector('#messages').replaceChildren();
  const container=[...el.querySelectorAll('[data-id]')].find(x=>x.dataset.id===p.id);
  container?.querySelector('.dot')?.remove();
+ const feedback=container?.querySelector('.health-row > span');if(feedback)feedback.outerHTML=healthFeedback(p);
  if(container){
   if(p.name){container.querySelector('h2').textContent=p.name;delete container.querySelector('h2').dataset.i18n;}else setText(container.querySelector('h2'),'未命名提供商');
   const model=container.querySelector('.card-head p');if(p.model){model.textContent=p.model;delete model.dataset.i18n;}else setText(model,'尚未选择模型');
@@ -44,8 +45,13 @@ function card(p){
  <label>${h("接入地址")}<input data-field="baseUrl" value="${esc(p.baseUrl)}" type="url" autocomplete="off" spellcheck="false"></label>
  <label>API Key<input data-field="key" type="password" value="${esc(p.key||'')}" ${a('placeholder',p.keyConfigured?'keepKey':'enterKey')} autocomplete="new-password" ${p.authEditable===false?'disabled':''}></label><p class="help">${h(p.keyConfigured?'已配置，保存的密钥不会再次展示。':'密钥只保存在本机配置中。')}</p>
  <div class="field"><label for="model-${esc(p.id)}">${h("默认模型")}</label><div class="model-row"><div class="model-picker"><input id="model-${esc(p.id)}" data-field="model" value="${esc(p.model)}" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="options-${esc(p.id)}" ${a('placeholder','选择或输入模型 ID')} autocomplete="off"><button type="button" class="model-toggle" ${a('aria-label','展开模型列表')}><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="model-options" id="options-${esc(p.id)}" role="listbox" popover></div></div><button data-action="models">${h("刷新模型")}</button></div></div><p class="help">${p.modelsAt?h('modelsUpdated',{date:p.modelsAt}):h('modelsHint')}</p>
- <div class="health-row"><button data-action="health" ${!healthConfigured(p)?'disabled':''}>${h("测试连接")}</button><span>${h(connectionHint(p))}</span></div>
+ <div class="health-row"><button data-action="health" ${!healthConfigured(p)?'disabled':''}>${h("测试连接")}</button>${healthFeedback(p)}</div>
  <details><summary>${h("高级配置")}<span>Raw Data</span></summary><p class="help">${h('rawHint')}</p><textarea ${a('aria-label','高级配置 JSON')} data-field="raw" spellcheck="false">${esc(raw(p))}</textarea><button data-action="health-template">${h("填入连接测试示例")}</button></details></div>`:''}</article>`;
+}
+function healthFeedback(p){
+ const result=results[p.id];
+ if(!result)return `<span>${h(connectionHint(p))}</span>`;
+ return `<span role="${result.ok?'status':'alert'}" class="${result.ok?'notice':'error'}">${h(result.ok?'healthPassed':result.error)}</span>`;
 }
 function healthConfigured(p){try{return !!parse(p).extra.health;}catch{return false;}}
 function connectionHint(p){return healthConfigured(p)?'使用当前草稿；POST 测试可能消耗额度。':'未配置测试请求，可在高级配置中设置。';}
@@ -68,7 +74,7 @@ function bind(){
   const id=document.querySelector('#new-id').value.trim(),name=document.querySelector('#new-name').value.trim();
   if(!/^[a-z0-9][a-z0-9_-]{0,63}$/.test(id)||!name||draft.providers.some(p=>p.id===id)||['openai','ollama','lmstudio','gcp','amazon-bedrock','amazon-bedrock-runtime'].includes(id)){setText(document.querySelector('#add-error'),'addInvalid');return;}
   const template=draft.templates.find(t=>t.id===document.querySelector('#template').value);
-  draft.providers.push({id,name,baseUrl:template?.baseUrl||'',model:template?.model||'',keyConfigured:false,extra:{provider:{wire_api:'responses'},model:{},discovery:{},health:null},models:[]});
+  draft.providers.push({id,name,baseUrl:template?.baseUrl||'',model:'',keyConfigured:false,extra:{provider:{wire_api:'responses'},model:{},discovery:{},health:null},models:[]});
   deleted=deleted.filter(x=>x!==id);editing=id;dirty=true;render();
  };
  for(const container of el.querySelectorAll('[data-id]')){
@@ -80,7 +86,7 @@ function bind(){
    if(field==='model'&&draft.selection.provider===p.id)draft.selection.model=p.model;
    changed(p);
    const healthButton=container.querySelector('[data-action="health"]');healthButton.disabled=!healthConfigured(p);
-   setText(container.querySelector('.health-row span'),connectionHint(p));
+   setText(container.querySelector('.health-row > span'),connectionHint(p));
   };
   if(container.querySelector('.model-picker'))bindModelPicker(container,p);
   for(const b of container.querySelectorAll('[data-action]'))b.onclick=()=>{
@@ -89,7 +95,7 @@ function bind(){
     case 'select':draft.selection={provider:p.id,model:p.model};dirty=true;render();break;
     case 'delete':if(draft.selection.provider===p.id){failure='请先选择其他默认提供商，再删除此项。';render();break;}if(confirm(t('deleteConfirm',{name:p.name}))){draft.providers=draft.providers.filter(x=>x.id!==p.id);if(saved.providers.some(x=>x.id===p.id))deleted.push(p.id);dirty=true;render();}break;
     case 'models':refreshModels(p,b);break;
-    case 'health':run(async()=>{const q=confirmOrigin(parse(p));const r=await call('provider_health',{provider:q});results[p.id]={ok:r.ok};notice=message('healthPassed');});break;
+    case 'health':delete results[p.id];run(async()=>{try{const q=confirmOrigin(parse(p));const r=await call('provider_health',{provider:q});results[p.id]={ok:r.ok,error:message('healthFailed')};}catch(e){results[p.id]={ok:false,error:e};}});break;
     case 'health-template':try{const x=parse(p).extra;x.health={path:'responses',method:'POST',body:{model:'$model',input:'Reply with OK.',max_output_tokens:64},expectStatus:200,timeoutSeconds:20};raws[p.id]=JSON.stringify(x,null,2);changed(p);render();}catch(e){failure=e;render();}break;
    }
   };

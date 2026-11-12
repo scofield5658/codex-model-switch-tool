@@ -290,3 +290,47 @@ test('manual restart platform saves without offering automatic restart',async({p
  await expect(page.getByRole('status')).toContainText('请手动退出');
  await expect(page.locator('#restart-dialog')).not.toBeVisible();
 });
+
+test('health results stay beside the provider button and clear on edits',async({page})=>{
+ await page.goto('http://127.0.0.1:43187');
+ await page.getByRole('button',{name:'编辑',exact:true}).first().click();
+ await page.getByText('Raw Data').click();
+ await page.getByRole('button',{name:'填入连接测试示例'}).click();
+ let fail=false;
+ await page.route('**/api/provider_health',route=>route.fulfill({json:fail?{ok:false,errorCode:'healthFailed'}:{ok:true,data:{ok:true}}}));
+ await page.getByRole('button',{name:'测试连接',exact:true}).click();
+ await expect(page.locator('.health-row [role=status]')).toContainText('连接测试通过');
+ await expect(page.locator('#messages')).toBeEmpty();
+ fail=true;
+ await page.getByRole('button',{name:'测试连接',exact:true}).click();
+ await expect(page.locator('.health-row [role=alert]')).toContainText('失败或未完成');
+ await expect(page.locator('#messages')).toBeEmpty();
+ await page.getByLabel('API Key').fill('changed-key');
+ await expect(page.locator('.health-row [role=alert]')).toHaveCount(0);
+ await expect(page.locator('.health-row')).toContainText('使用当前草稿');
+ await expect(page.getByRole('button',{name:'测试连接',exact:true})).toBeVisible();
+});
+
+test('new provider template supplies only the URL',async({page})=>{
+ await page.goto('http://127.0.0.1:43187');
+ await page.locator('#add').click();
+ await page.locator('#template').selectOption('moonshotai-cn');
+ await expect(page.locator('#new-name')).toHaveValue('Moonshot');
+ await expect(page.locator('#new-id')).toHaveValue('moonshotai-cn');
+ await page.locator('#new-name').fill('My Moonshot');
+ await page.locator('#new-id').fill('my-moonshot');
+ await page.locator('#confirm-add').click();
+ const card=page.locator('[data-id="my-moonshot"]');
+ await expect(card.locator('[data-field=baseUrl]')).toHaveValue('https://api.moonshot.cn/v1');
+ await expect(card.locator('[data-field=model]')).toHaveValue('');
+ await expect(card.locator('[data-field=key]')).toHaveValue('');
+ const extra=JSON.parse(await card.locator('textarea').inputValue());
+ expect(extra).toEqual({provider:{wire_api:'responses'},model:{},discovery:{},health:null});
+ await page.route('**/api/provider_models',route=>route.fulfill({json:{ok:true,data:{models:[{id:'user-model',name:'user-model'}],checkedAt:'2026-11-12'}}}));
+ await card.locator('[data-field=key]').fill('fixture-key');
+ await card.locator('[data-action=models]').click();
+ await expect(card.locator('[data-field=model]')).toHaveValue('');
+ await card.getByRole('button',{name:'展开模型列表'}).click();
+ await card.getByRole('option',{name:'user-model',exact:true}).click();
+ await expect(card.locator('[data-field=model]')).toHaveValue('user-model');
+});

@@ -143,3 +143,7 @@ dialog h2 { margin-bottom: 14px; }
 .initialization-details { margin: 16px 0; overflow-wrap: anywhere; }
 @keyframes initialization-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .loading-spinner { animation: none; } }
+
+.health-row > .notice, .health-row > .error { border: 0; padding: 0; margin: 0; flex: 1; min-width: 160px; overflow-wrap: anywhere; }
+.health-row > .notice, .health-row > .notice span { color: var(--color-text-success, #c1dac8); }
+.health-row > .error, .health-row > .error span { color: var(--color-text-danger, #ffb1b1); }
