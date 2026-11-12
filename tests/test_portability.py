@@ -42,8 +42,8 @@ class PortabilityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td)/'config.toml'
             atomic(path, 'key = "fixture"')
-            command = "$a=Get-Acl -LiteralPath $env:ACL_TEST_FILE; $a.Access | ForEach-Object { $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value }"
+            command = "$ErrorActionPreference='Stop'; $a=Get-Acl -LiteralPath $env:ACL_TEST_FILE; $a.GetAccessRules($true,$true,[System.Security.Principal.SecurityIdentifier]) | ForEach-Object { $_.IdentityReference.Value }"
             result = subprocess.run(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', command], env={**os.environ, 'ACL_TEST_FILE': str(path)}, capture_output=True, text=True, check=True)
             sids = set(result.stdout.split())
-            self.assertTrue(sids)
+            self.assertTrue(sids, result.stderr)
             self.assertFalse(sids & {'S-1-1-0', 'S-1-5-11', 'S-1-5-32-545'})
