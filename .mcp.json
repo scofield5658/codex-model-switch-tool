@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "model-switcher": {
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/dist/server.cjs"
+      ]
+    }
+  }
+}

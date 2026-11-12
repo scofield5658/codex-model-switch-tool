@@ -1,0 +1,692 @@
+{
+  "title": {
+    "zh-Hans": "自定义模型配置",
+    "zh-Hant": "自訂模型設定",
+    "en": "Custom Model Settings"
+  },
+  "intro": {
+    "zh-Hans": "管理接入，选择下次启动使用的模型。",
+    "zh-Hant": "管理連線，選擇下次啟動使用的模型。",
+    "en": "Manage connections and choose the model for the next launch."
+  },
+  "loading": {
+    "zh-Hans": "正在读取本机配置…",
+    "zh-Hant": "正在讀取本機設定…",
+    "en": "Loading local settings…"
+  },
+  "reload": {
+    "zh-Hans": "重新加载",
+    "zh-Hant": "重新載入",
+    "en": "Reload"
+  },
+  "unsaved": {
+    "zh-Hans": "有未保存修改",
+    "zh-Hant": "有尚未儲存的變更",
+    "en": "Unsaved changes"
+  },
+  "actions": {
+    "zh-Hans": "配置操作",
+    "zh-Hant": "設定操作",
+    "en": "Settings actions"
+  },
+  "reset": {
+    "zh-Hans": "重置",
+    "zh-Hant": "重設",
+    "en": "Reset"
+  },
+  "save": {
+    "zh-Hans": "保存",
+    "zh-Hant": "儲存",
+    "en": "Save"
+  },
+  "restart": {
+    "zh-Hans": "保存并重启",
+    "zh-Hant": "儲存並重新啟動",
+    "en": "Save & restart"
+  },
+  "savedDefault": {
+    "zh-Hans": "已保存默认",
+    "zh-Hant": "已儲存的預設值",
+    "en": "Saved default"
+  },
+  "runtimeNote": {
+    "zh-Hans": "当前运行模型待核实；保存后请重启，并在新聊天中验证。",
+    "zh-Hant": "目前執行的模型尚待確認；儲存後請重新啟動，並在新對話中驗證。",
+    "en": "Restart after saving, then verify the model in a new chat."
+  },
+  "providers": {
+    "zh-Hans": "提供商列表",
+    "zh-Hant": "供應商清單",
+    "en": "Providers"
+  },
+  "native": {
+    "zh-Hans": "内置 GPT",
+    "zh-Hant": "內建 GPT",
+    "en": "Built-in GPT"
+  },
+  "nativeUnknown": {
+    "zh-Hans": "未记录原始配置",
+    "zh-Hant": "未記錄原始設定",
+    "en": "Original settings not recorded"
+  },
+  "selected": {
+    "zh-Hans": "已选为默认",
+    "zh-Hant": "已選為預設",
+    "en": "Default"
+  },
+  "setDefault": {
+    "zh-Hans": "设为默认",
+    "zh-Hant": "設為預設",
+    "en": "Set default"
+  },
+  "addProvider": {
+    "zh-Hans": "添加模型提供商",
+    "zh-Hant": "新增模型供應商",
+    "en": "Add model provider"
+  },
+  "addProviderButton": {
+    "zh-Hans": "＋ 添加模型提供商",
+    "zh-Hant": "＋ 新增模型供應商",
+    "en": "＋ Add model provider"
+  },
+  "restartTitle": {
+    "zh-Hans": "保存并重启 Codex",
+    "zh-Hant": "儲存並重新啟動 Codex",
+    "en": "Save and restart Codex"
+  },
+  "restartWarning": {
+    "zh-Hans": "这会退出整个客户端。插件无法自动核实所有聊天的运行状态，请先结束各窗口中的任务。",
+    "zh-Hant": "這會結束整個用戶端。外掛無法自動確認所有對話的執行狀態，請先結束各視窗中的任務。",
+    "en": "This closes the entire app. Finish tasks in all windows first; the plugin cannot check every chat's status."
+  },
+  "restartNote": {
+    "zh-Hans": "重启后请新建聊天验证。已有聊天可能仍保留原来的模型。",
+    "zh-Hant": "重新啟動後請建立新對話驗證。既有對話可能仍保留原來的模型。",
+    "en": "Verify in a new chat after restarting. Existing chats may keep their original model."
+  },
+  "idle": {
+    "zh-Hans": "我已确认所有任务结束，可以重启",
+    "zh-Hant": "我已確認所有任務已結束，可以重新啟動",
+    "en": "All tasks have finished; it is safe to restart"
+  },
+  "cancel": {
+    "zh-Hans": "取消",
+    "zh-Hant": "取消",
+    "en": "Cancel"
+  },
+  "confirmRestart": {
+    "zh-Hans": "确认保存并重启",
+    "zh-Hant": "確認儲存並重新啟動",
+    "en": "Confirm save & restart"
+  },
+  "template": {
+    "zh-Hans": "服务商模板",
+    "zh-Hant": "供應商範本",
+    "en": "Provider template"
+  },
+  "custom": {
+    "zh-Hans": "自定义",
+    "zh-Hant": "自訂",
+    "en": "Custom"
+  },
+  "name": {
+    "zh-Hans": "名称",
+    "zh-Hant": "名稱",
+    "en": "Name"
+  },
+  "nameExample": {
+    "zh-Hans": "例如：Kimi Code",
+    "zh-Hant": "例如：Kimi Code",
+    "en": "e.g. Kimi Code"
+  },
+  "idExample": {
+    "zh-Hans": "小写字母、数字和连字符",
+    "zh-Hant": "小寫字母、數字與連字號",
+    "en": "Lowercase letters, numbers and hyphens"
+  },
+  "add": {
+    "zh-Hans": "添加",
+    "zh-Hant": "新增",
+    "en": "Add"
+  },
+  "unnamed": {
+    "zh-Hans": "未命名提供商",
+    "zh-Hant": "未命名供應商",
+    "en": "Unnamed provider"
+  },
+  "noModel": {
+    "zh-Hans": "尚未选择模型",
+    "zh-Hant": "尚未選擇模型",
+    "en": "No model selected"
+  },
+  "collapse": {
+    "zh-Hans": "收起",
+    "zh-Hant": "收合",
+    "en": "Collapse"
+  },
+  "edit": {
+    "zh-Hans": "编辑",
+    "zh-Hant": "編輯",
+    "en": "Edit"
+  },
+  "delete": {
+    "zh-Hans": "删除",
+    "zh-Hant": "刪除",
+    "en": "Delete"
+  },
+  "configName": {
+    "zh-Hans": "配置名称",
+    "zh-Hant": "設定名稱",
+    "en": "Configuration name"
+  },
+  "baseUrl": {
+    "zh-Hans": "接入地址",
+    "zh-Hant": "連線位址",
+    "en": "Base URL"
+  },
+  "keepKey": {
+    "zh-Hans": "留空保留已保存密钥",
+    "zh-Hant": "留空以保留已儲存的金鑰",
+    "en": "Leave blank to keep the saved key"
+  },
+  "enterKey": {
+    "zh-Hans": "填写 API Key",
+    "zh-Hant": "輸入 API Key",
+    "en": "Enter API key"
+  },
+  "keySaved": {
+    "zh-Hans": "已配置，保存的密钥不会再次展示。",
+    "zh-Hant": "已設定，儲存的金鑰不會再次顯示。",
+    "en": "A key is saved and will not be displayed again."
+  },
+  "keyLocal": {
+    "zh-Hans": "密钥只保存在本机配置中。",
+    "zh-Hant": "金鑰只儲存在本機設定中。",
+    "en": "The key is stored only in local settings."
+  },
+  "defaultModel": {
+    "zh-Hans": "默认模型",
+    "zh-Hant": "預設模型",
+    "en": "Default model"
+  },
+  "modelPlaceholder": {
+    "zh-Hans": "选择或输入模型 ID",
+    "zh-Hant": "選擇或輸入模型 ID",
+    "en": "Select or enter a model ID"
+  },
+  "expandModels": {
+    "zh-Hans": "展开模型列表",
+    "zh-Hant": "展開模型清單",
+    "en": "Show model list"
+  },
+  "refreshModels": {
+    "zh-Hans": "刷新模型",
+    "zh-Hant": "重新整理模型",
+    "en": "Refresh models"
+  },
+  "modelsHint": {
+    "zh-Hans": "可查询模型列表，也可直接输入准确的模型 ID。",
+    "zh-Hant": "可查詢模型清單，也可直接輸入正確的模型 ID。",
+    "en": "Fetch available models or enter an exact model ID."
+  },
+  "modelsUpdated": {
+    "zh-Hans": "列表更新于 {date}",
+    "zh-Hant": "清單更新於 {date}",
+    "en": "List updated {date}"
+  },
+  "testConnection": {
+    "zh-Hans": "测试连接",
+    "zh-Hant": "測試連線",
+    "en": "Test connection"
+  },
+  "advanced": {
+    "zh-Hans": "高级配置",
+    "zh-Hant": "進階設定",
+    "en": "Advanced"
+  },
+  "advancedJson": {
+    "zh-Hans": "高级配置 JSON",
+    "zh-Hant": "進階設定 JSON",
+    "en": "Advanced settings JSON"
+  },
+  "rawHint": {
+    "zh-Hans": "凭证不在此编辑。health 为 null 时禁用测试；body 中的 \"$model\" 使用所选模型。",
+    "zh-Hant": "不在此編輯憑證。health 為 null 時停用測試；body 中的 \"$model\" 使用所選模型。",
+    "en": "Credentials are not edited here. Set health to null to disable testing; \"$model\" in body uses the selected model."
+  },
+  "healthExample": {
+    "zh-Hans": "填入连接测试示例",
+    "zh-Hant": "填入連線測試範例",
+    "en": "Insert test example"
+  },
+  "healthHint": {
+    "zh-Hans": "使用当前草稿；POST 测试可能消耗额度。",
+    "zh-Hant": "使用目前草稿；POST 測試可能消耗額度。",
+    "en": "Uses the current draft. POST tests may consume credits."
+  },
+  "noHealth": {
+    "zh-Hans": "未配置测试请求，可在高级配置中设置。",
+    "zh-Hant": "未設定測試請求，可在進階設定中設定。",
+    "en": "Configure a test request in Advanced to enable testing."
+  },
+  "rawInvalid": {
+    "zh-Hans": "Raw Data JSON 格式错误，请修正或重置。",
+    "zh-Hant": "Raw Data JSON 格式錯誤，請修正或重設。",
+    "en": "Invalid Raw Data JSON. Correct it or reset the draft."
+  },
+  "reloadConfirm": {
+    "zh-Hans": "重新加载会丢弃未保存修改，继续吗？",
+    "zh-Hant": "重新載入會捨棄尚未儲存的變更，要繼續嗎？",
+    "en": "Reloading discards unsaved changes. Continue?"
+  },
+  "reloaded": {
+    "zh-Hans": "已重新加载。",
+    "zh-Hant": "已重新載入。",
+    "en": "Reloaded."
+  },
+  "addInvalid": {
+    "zh-Hans": "请输入有效且不重复的名称与 ID。",
+    "zh-Hant": "請輸入有效且不重複的名稱與 ID。",
+    "en": "Enter a valid name and a unique provider ID."
+  },
+  "deleteSelected": {
+    "zh-Hans": "请先选择其他默认提供商，再删除此项。",
+    "zh-Hant": "請先選擇其他預設供應商，再刪除此項。",
+    "en": "Choose another default provider before deleting this one."
+  },
+  "deleteConfirm": {
+    "zh-Hans": "删除 {name}？保存后将同时移除它的凭证配置。",
+    "zh-Hant": "刪除 {name}？儲存後也會移除其憑證設定。",
+    "en": "Delete {name}? Saving will also remove its credential settings."
+  },
+  "modelsFetched": {
+    "zh-Hans": "已获取 {count} 个模型",
+    "zh-Hant": "已取得 {count} 個模型",
+    "en": "Fetched {count} models"
+  },
+  "refreshFailed": {
+    "zh-Hans": "刷新失败：{error}",
+    "zh-Hant": "重新整理失敗：{error}",
+    "en": "Refresh failed: {error}"
+  },
+  "invalidUrl": {
+    "zh-Hans": "接入地址无效。",
+    "zh-Hant": "連線位址無效。",
+    "en": "Invalid base URL."
+  },
+  "originConfirm": {
+    "zh-Hans": "接入域名已改变，继续将把已保存凭证发送到新域名。确认信任此地址吗？",
+    "zh-Hant": "連線網域已變更，繼續會將已儲存的憑證傳送至新網域。確認信任此位址嗎？",
+    "en": "The domain has changed. Continuing sends the saved credential to the new domain. Do you trust it?"
+  },
+  "originCancelled": {
+    "zh-Hans": "已取消域名变更。",
+    "zh-Hant": "已取消網域變更。",
+    "en": "Domain change cancelled."
+  },
+  "saved": {
+    "zh-Hans": "已保存，下次启动生效。",
+    "zh-Hant": "已儲存，下次啟動時生效。",
+    "en": "Saved. Takes effect on the next launch."
+  },
+  "openFromPlugin": {
+    "zh-Hans": "请从 Codex 插件入口打开。",
+    "zh-Hant": "請從 Codex 外掛入口開啟。",
+    "en": "Open this page from the Codex plugin entry."
+  },
+  "noMatches": {
+    "zh-Hans": "无匹配模型，可直接输入模型 ID",
+    "zh-Hant": "沒有符合的模型，可直接輸入模型 ID",
+    "en": "No matching models. You can enter a model ID."
+  },
+  "operationFailed": {
+    "zh-Hans": "操作失败。",
+    "zh-Hant": "操作失敗。",
+    "en": "Operation failed."
+  },
+  "localFailure": {
+    "zh-Hans": "操作未完成，请检查本地配置格式及文件权限。",
+    "zh-Hant": "操作未完成，請檢查本機設定格式與檔案權限。",
+    "en": "Operation failed. Check the local configuration format and file permissions."
+  },
+  "urlFormat": {
+    "zh-Hans": "地址必须是无凭证、无查询参数的 HTTP(S) URL。",
+    "zh-Hant": "位址必須是不含憑證或查詢參數的 HTTP(S) URL。",
+    "en": "Use an HTTP(S) URL without credentials or query parameters."
+  },
+  "httpsRequired": {
+    "zh-Hans": "非本机服务必须使用 HTTPS。",
+    "zh-Hant": "非本機服務必須使用 HTTPS。",
+    "en": "Remote services must use HTTPS."
+  },
+  "rawSections": {
+    "zh-Hans": "Raw Data 只支持 provider、model、discovery、health。",
+    "zh-Hant": "Raw Data 僅支援 provider、model、discovery、health。",
+    "en": "Raw Data supports only provider, model, discovery and health."
+  },
+  "rawFields": {
+    "zh-Hans": "Raw Data 包含不支持的字段；凭证和认证命令不能在这里编辑。",
+    "zh-Hant": "Raw Data 含有不支援的欄位；無法在此編輯憑證與驗證命令。",
+    "en": "Unsupported Raw Data fields. Credentials and authentication commands cannot be edited here."
+  },
+  "responsesOnly": {
+    "zh-Hans": "当前仅支持 Responses 协议。",
+    "zh-Hant": "目前僅支援 Responses 協定。",
+    "en": "Only the Responses protocol is supported."
+  },
+  "websocketType": {
+    "zh-Hans": "supports_websockets 必须为布尔值。",
+    "zh-Hant": "supports_websockets 必須為布林值。",
+    "en": "supports_websockets must be a boolean."
+  },
+  "catalogUrl": {
+    "zh-Hans": "model_catalog_url 必须为非空地址。",
+    "zh-Hant": "model_catalog_url 必須為非空位址。",
+    "en": "model_catalog_url must be a nonempty URL."
+  },
+  "headerInvalid": {
+    "zh-Hans": "自定义请求头不能包含凭证、Host 或换行。",
+    "zh-Hant": "自訂請求標頭不能包含憑證、Host 或換行。",
+    "en": "Custom headers cannot contain credentials, Host or line breaks."
+  },
+  "timeoutInvalid": {
+    "zh-Hans": "超时和重试参数必须是合理的非负整数。",
+    "zh-Hant": "逾時與重試參數必須是合理的非負整數。",
+    "en": "Timeout and retry values must be nonnegative integers within the allowed range."
+  },
+  "contextInvalid": {
+    "zh-Hans": "上下文参数必须为正整数。",
+    "zh-Hant": "上下文參數必須為正整數。",
+    "en": "Context parameters must be positive integers."
+  },
+  "modelOptionType": {
+    "zh-Hans": "模型选项必须为字符串。",
+    "zh-Hant": "模型選項必須為字串。",
+    "en": "Model options must be strings."
+  },
+  "modelOptionInvalid": {
+    "zh-Hans": "{field} 取值无效。",
+    "zh-Hant": "{field} 的值無效。",
+    "en": "Invalid value for {field}."
+  },
+  "compactInvalid": {
+    "zh-Hans": "自动压缩阈值必须小于上下文窗口。",
+    "zh-Hant": "自動壓縮閾值必須小於上下文視窗。",
+    "en": "The auto-compaction threshold must be smaller than the context window."
+  },
+  "discoveryInvalid": {
+    "zh-Hans": "discovery 仅支持 url。",
+    "zh-Hant": "discovery 僅支援 url。",
+    "en": "discovery supports only url."
+  },
+  "healthInvalid": {
+    "zh-Hans": "连接测试配置字段无效。",
+    "zh-Hant": "連線測試設定欄位無效。",
+    "en": "Invalid connection test fields."
+  },
+  "healthPath": {
+    "zh-Hans": "连接测试需要 path。",
+    "zh-Hant": "連線測試需要 path。",
+    "en": "Connection tests require a path."
+  },
+  "healthMethod": {
+    "zh-Hans": "连接测试仅支持 GET/POST。",
+    "zh-Hant": "連線測試僅支援 GET/POST。",
+    "en": "Connection tests support only GET/POST."
+  },
+  "healthStatus": {
+    "zh-Hans": "成功状态码无效。",
+    "zh-Hant": "成功狀態碼無效。",
+    "en": "Invalid expected status code."
+  },
+  "healthTimeout": {
+    "zh-Hans": "测试超时应在 1–60 秒之间。",
+    "zh-Hant": "測試逾時應介於 1–60 秒。",
+    "en": "Test timeout must be between 1 and 60 seconds."
+  },
+  "rawLarge": {
+    "zh-Hans": "Raw Data 过大。",
+    "zh-Hant": "Raw Data 過大。",
+    "en": "Raw Data is too large."
+  },
+  "tomlInvalid": {
+    "zh-Hans": "config.toml 格式错误，未读取或修改；请在本地修复。",
+    "zh-Hant": "config.toml 格式錯誤，未讀取或修改；請在本機修復。",
+    "en": "Invalid config.toml. It was not read or modified; repair it locally."
+  },
+  "interruptedConflict": {
+    "zh-Hans": "上次保存中断且配置已被其他程序修改，请从备份人工核对。",
+    "zh-Hant": "上次儲存中斷且設定已被其他程式修改，請從備份手動核對。",
+    "en": "The previous save was interrupted and another program changed the configuration. Review the backup manually."
+  },
+  "stateInvalid": {
+    "zh-Hans": "插件状态文件损坏，请先恢复插件状态备份。",
+    "zh-Hant": "外掛狀態檔案損毀，請先還原外掛狀態備份。",
+    "en": "The plugin state file is damaged. Restore its backup first."
+  },
+  "providerInvalid": {
+    "zh-Hans": "提供商格式错误。",
+    "zh-Hant": "供應商格式錯誤。",
+    "en": "Invalid provider format."
+  },
+  "providerIdInvalid": {
+    "zh-Hans": "Provider ID 无效或保留。",
+    "zh-Hant": "Provider ID 無效或為保留值。",
+    "en": "Invalid or reserved provider ID."
+  },
+  "nameRequired": {
+    "zh-Hans": "名称不能为空。",
+    "zh-Hant": "名稱不能為空。",
+    "en": "Name is required."
+  },
+  "modelIdInvalid": {
+    "zh-Hans": "模型 ID 无效。",
+    "zh-Hant": "模型 ID 無效。",
+    "en": "Invalid model ID."
+  },
+  "keyInvalid": {
+    "zh-Hans": "Key 格式无效。",
+    "zh-Hant": "Key 格式無效。",
+    "en": "Invalid key format."
+  },
+  "keyAuth": {
+    "zh-Hans": "该提供商采用其他认证方式，不能在此替换 Key。",
+    "zh-Hant": "該供應商採用其他驗證方式，無法在此替換 Key。",
+    "en": "This provider uses another authentication method; its key cannot be replaced here."
+  },
+  "originRequired": {
+    "zh-Hans": "接入域名已改变，请明确确认后才能沿用已保存凭证。",
+    "zh-Hant": "連線網域已變更，請明確確認後才能沿用已儲存的憑證。",
+    "en": "Confirm the domain change before reusing saved credentials."
+  },
+  "catalogOrigin": {
+    "zh-Hans": "模型目录必须与接入地址同源。",
+    "zh-Hant": "模型目錄必須與連線位址同源。",
+    "en": "The model catalog must have the same origin as the base URL."
+  },
+  "authUnsupported": {
+    "zh-Hans": "该认证方式暂不支持插件直接测试。",
+    "zh-Hant": "該驗證方式暫不支援外掛直接測試。",
+    "en": "The plugin cannot test this authentication method directly."
+  },
+  "keyMissing": {
+    "zh-Hans": "未配置可用 Key，或插件进程未读取到对应环境变量。",
+    "zh-Hant": "未設定可用 Key，或外掛程序未讀取到對應的環境變數。",
+    "en": "No usable key is configured, or the plugin cannot read its environment variable."
+  },
+  "revisionConflict": {
+    "zh-Hans": "配置已被其他窗口或程序修改，请重新加载后再保存。",
+    "zh-Hant": "設定已被其他視窗或程式修改，請重新載入後再儲存。",
+    "en": "Another window or program changed the settings. Reload before saving."
+  },
+  "providersInvalid": {
+    "zh-Hans": "提供商列表格式错误。",
+    "zh-Hant": "供應商清單格式錯誤。",
+    "en": "Invalid provider list."
+  },
+  "providerDuplicate": {
+    "zh-Hans": "Provider ID 重复。",
+    "zh-Hant": "Provider ID 重複。",
+    "en": "Duplicate provider ID."
+  },
+  "deleteRequired": {
+    "zh-Hans": "删除提供商必须明确确认。",
+    "zh-Hant": "刪除供應商必須明確確認。",
+    "en": "Provider deletion requires explicit confirmation."
+  },
+  "providerMissing": {
+    "zh-Hans": "请选择存在的默认提供商。",
+    "zh-Hant": "請選擇現有的預設供應商。",
+    "en": "Select an existing default provider."
+  },
+  "providerScope": {
+    "zh-Hans": "本插件仅管理内置 OpenAI 和自定义提供商。",
+    "zh-Hant": "此外掛僅管理內建 OpenAI 與自訂供應商。",
+    "en": "This plugin manages only built-in OpenAI and custom providers."
+  },
+  "nativeMissing": {
+    "zh-Hans": "尚未记录原始 GPT 配置，不能自动恢复。",
+    "zh-Hant": "尚未記錄原始 GPT 設定，無法自動還原。",
+    "en": "The original GPT configuration was not recorded and cannot be restored automatically."
+  },
+  "modelRequired": {
+    "zh-Hans": "请选择默认模型。",
+    "zh-Hant": "請選擇預設模型。",
+    "en": "Select a default model."
+  },
+  "writeConflict": {
+    "zh-Hans": "保存期间配置发生变化，已停止写入。",
+    "zh-Hant": "儲存期間設定發生變更，已停止寫入。",
+    "en": "Settings changed during saving. The write was stopped."
+  },
+  "restartConflict": {
+    "zh-Hans": "配置已变化，请重新加载后再重启。",
+    "zh-Hant": "設定已變更，請重新載入後再重新啟動。",
+    "en": "Settings changed. Reload before restarting."
+  },
+  "unknownOperation": {
+    "zh-Hans": "未知操作。",
+    "zh-Hant": "未知操作。",
+    "en": "Unknown operation."
+  },
+  "requestLarge": {
+    "zh-Hans": "请求过大。",
+    "zh-Hant": "請求過大。",
+    "en": "Request is too large."
+  },
+  "requestOrigin": {
+    "zh-Hans": "测试和模型查询地址必须与接入地址同源。",
+    "zh-Hant": "測試與模型查詢位址必須與連線位址同源。",
+    "en": "Test and model-list URLs must have the same origin as the base URL."
+  },
+  "responseLarge": {
+    "zh-Hans": "响应超过 1 MiB，已停止读取。",
+    "zh-Hant": "回應超過 1 MiB，已停止讀取。",
+    "en": "Response exceeded 1 MiB. Reading was stopped."
+  },
+  "httpError": {
+    "zh-Hans": "服务返回 HTTP {status}；请检查地址、凭证及模型权限。",
+    "zh-Hant": "服務回傳 HTTP {status}；請檢查位址、憑證與模型權限。",
+    "en": "The service returned HTTP {status}. Check the URL, credentials and model permissions."
+  },
+  "networkError": {
+    "zh-Hans": "连接失败或超时，请检查网络和服务地址。",
+    "zh-Hant": "連線失敗或逾時，請檢查網路與服務位址。",
+    "en": "Connection failed or timed out. Check the network and service URL."
+  },
+  "modelsInvalid": {
+    "zh-Hans": "服务未返回可识别的模型列表，可手动输入模型 ID。",
+    "zh-Hant": "服務未回傳可辨識的模型清單，可手動輸入模型 ID。",
+    "en": "No recognized model list was returned. Enter a model ID manually."
+  },
+  "healthMissing": {
+    "zh-Hans": "未配置连接测试。",
+    "zh-Hant": "未設定連線測試。",
+    "en": "No connection test is configured."
+  },
+  "healthMismatch": {
+    "zh-Hans": "HTTP 状态与连接测试预期不符。",
+    "zh-Hant": "HTTP 狀態與連線測試預期不符。",
+    "en": "The HTTP status did not match the expected status."
+  },
+  "healthFailed": {
+    "zh-Hans": "服务返回了失败或未完成的模型响应。",
+    "zh-Hant": "服務回傳了失敗或未完成的模型回應。",
+    "en": "The service returned a failed or incomplete model response."
+  },
+  "healthPassed": {
+    "zh-Hans": "配置的连接测试通过；不代表全部 Agent 能力已验证。",
+    "zh-Hant": "設定的連線測試通過；不代表所有 Agent 能力均已驗證。",
+    "en": "The configured connection test passed. This does not verify all agent capabilities."
+  },
+  "restartIdle": {
+    "zh-Hans": "重启前请确认所有窗口中的任务均已结束。",
+    "zh-Hant": "重新啟動前請確認所有視窗中的任務均已結束。",
+    "en": "Confirm that tasks in all windows have finished before restarting."
+  },
+  "restartManual": {
+    "zh-Hans": "当前系统请手动退出并重新启动 Codex。",
+    "zh-Hant": "目前系統請手動結束並重新啟動 Codex。",
+    "en": "Quit and restart Codex manually on this system."
+  },
+  "restartScheduled": {
+    "zh-Hans": "已安排正常退出并重新打开；若系统取消退出，请手动重启。",
+    "zh-Hant": "已安排正常結束並重新開啟；若系統取消結束，請手動重新啟動。",
+    "en": "A graceful restart is scheduled. If quitting is cancelled, restart manually."
+  },
+  "backendTimeout": {
+    "zh-Hans": "本地操作超时，配置可能已保存，请重新加载核对。",
+    "zh-Hant": "本機操作逾時，設定可能已儲存，請重新載入核對。",
+    "en": "The local operation timed out. Settings may have been saved; reload to verify."
+  },
+  "backendResponseLarge": {
+    "zh-Hans": "响应过大。",
+    "zh-Hant": "回應過大。",
+    "en": "Response is too large."
+  },
+  "pythonStart": {
+    "zh-Hans": "无法启动本地 Python，请运行插件 setup。",
+    "zh-Hant": "無法啟動本機 Python，請檢查 Python 安裝與路徑設定。",
+    "en": "Cannot start local Python. Check its installation and configured path."
+  },
+  "backendInvalid": {
+    "zh-Hans": "本地配置服务未正常返回。",
+    "zh-Hant": "本機設定服務未正常回傳。",
+    "en": "The local configuration service did not return a valid response."
+  },
+  "requestJson": {
+    "zh-Hans": "请求 JSON 无效。",
+    "zh-Hant": "請求 JSON 無效。",
+    "en": "Invalid request JSON."
+  },
+  "uvMissing": {
+    "zh-Hans": "找不到 uv。请安装 uv，或通过 MODEL_SWITCHER_UV 指定路径，然后重新加载。",
+    "zh-Hant": "找不到 uv。請安裝 uv，或透過 MODEL_SWITCHER_UV 指定路徑，然後重新載入。",
+    "en": "uv was not found. Install uv or set MODEL_SWITCHER_UV to its executable, then reload."
+  },
+  "pythonManifest": {
+    "zh-Hans": "Python 环境文件缺失或无效，请重新安装插件。",
+    "zh-Hant": "Python 環境檔案遺失或無效，請重新安裝外掛。",
+    "en": "Python environment metadata is missing or invalid. Reinstall the plugin."
+  },
+  "pythonRuntimePath": {
+    "zh-Hans": "MODEL_SWITCHER_RUNTIME_DIR 必须是绝对路径。",
+    "zh-Hant": "MODEL_SWITCHER_RUNTIME_DIR 必須是絕對路徑。",
+    "en": "MODEL_SWITCHER_RUNTIME_DIR must be an absolute path."
+  },
+  "pythonSetupFailed": {
+    "zh-Hans": "Python 环境准备失败。请检查网络及目录权限，运行 node dist/setup-runtime.cjs 后重新加载；不会改用系统 Python。",
+    "zh-Hant": "Python 環境準備失敗。請檢查網路及目錄權限，執行 node dist/setup-runtime.cjs 後重新載入；不會改用系統 Python。",
+    "en": "Python setup failed. Check network access and directory permissions, run node dist/setup-runtime.cjs in the plugin directory, then reload. System Python will not be used."
+  },
+  "pythonSetupTimeout": {
+    "zh-Hans": "Python 环境准备超时。请在插件目录运行 node dist/setup-runtime.cjs，完成后重新加载。",
+    "zh-Hant": "Python 環境準備逾時。請在外掛目錄執行 node dist/setup-runtime.cjs，完成後重新載入。",
+    "en": "Python setup timed out. Run node dist/setup-runtime.cjs in the plugin directory, then reload."
+  },
+  "retry": {
+    "zh-Hans": "重试",
+    "zh-Hant": "重試",
+    "en": "Retry"
+  }
+}

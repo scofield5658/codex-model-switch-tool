@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'tests',testMatch:'ui.spec.mjs',workers:1,use:{headless:true,viewport:{width:1100,height:900},launchOptions:{...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{})}},webServer:{command:'node tests/preview-server.mjs',url:'http://127.0.0.1:43187',reuseExistingServer:true},reporter:'list'});

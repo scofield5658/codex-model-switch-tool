@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+await mkdir('dist',{recursive:true});
+await build({entryPoints:['server.mjs'],outfile:'dist/server.cjs',bundle:true,platform:'node',target:'node22',format:'cjs'});
+await build({entryPoints:['scripts/setup-runtime.mjs'],outfile:'dist/setup-runtime.cjs',bundle:true,platform:'node',target:'node22',format:'cjs'});
+const test=process.argv.includes('--test-ui');
+await build({entryPoints:['ui/app.js'],outfile:'dist/app.js',bundle:true,format:'iife',target:'es2022',...(test?{plugins:[{name:'test-transport',setup(b){b.onResolve({filter:/^\.\/transport\.js$/},()=>({path:process.cwd()+'/tests/transport.js'}));}}]}:{})});
+const js=await readFile('dist/app.js','utf8'),css=await readFile('dist/app.css','utf8');
+await writeFile('dist/'+(test?'test-ui.html':'ui.html'),`<!doctype html><html lang="zh-CN"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>自定义模型配置</title><style>${css}</style><div id="app"></div><script>${js.replace(/<\/script/gi,'<\\/script')}</script></html>`);
+console.log('Built MCP server and '+(test?'test':'production')+' App UI.');

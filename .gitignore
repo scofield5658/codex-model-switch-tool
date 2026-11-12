@@ -1,0 +1,51 @@
+# Dependencies and generated bundles
+node_modules/
+.pnpm-store/
+.venv/
+.venv-*/
+.uv-cache/
+uv-cache/
+venv/
+dist/
+release/
+backend/vendor/
+# Keep pyproject.toml, uv.lock and .python-version tracked.
+/runtimes/
+
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+.coverage
+htmlcov/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# Local screenshots; approved README images live in docs/images/.
+docs/*.png
+docs/*.jpg
+docs/*.webp
+
+# Local credentials/configuration; keep examples eligible for review
+.env
+.env.*
+!.env.example
+/config.toml
+/auth.json
+/model-switcher/
+.codex/
+*.pem
+*.key
+
+# Editor, OS and debug artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+*.tmp
