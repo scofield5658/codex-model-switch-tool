@@ -99,7 +99,7 @@ uv run --locked --managed-python --no-config python tests/plugin-loader.py
 ```sh
 pnpm setup:runtime
 codex plugin marketplace add /absolute/path/to/release/local-marketplace
-codex plugin add codex-model-switcher@local-model-tools
+codex plugin add codex-model-switch-tool@model-switch-plugin
 ```
 
 `pnpm setup:runtime` 用于源码开发者预先准备运行环境；直接使用发行包时，在插件根目录运行 `node dist/setup-runtime.cjs`。也可让首次打开页面自动准备，超过 45 秒会提示改用上述命令，准备完成后重新加载即可。不会自动安装 uv 或退回系统 Python。
@@ -110,7 +110,9 @@ codex plugin add codex-model-switcher@local-model-tools
 
 ## 可移植性与发布准备
 
-源码仓库名称为 `codex-model-switch-tool`；插件内部 ID 保持 `codex-model-switcher`，避免影响已有安装。
+源码仓库和插件内部 ID 统一为 `codex-model-switch-tool`。`model-switch-plugin` 是发行包提供的 marketplace（插件来源目录）名称，不是用户账号。
+
+旧版本使用 `codex-model-switcher@local-model-tools`；新标识会被视为不同插件，不会原地替换旧安装。已有用户请先移除旧插件，再按上述命令添加新版 marketplace 并安装新插件，避免两个入口同时存在。此命名调整不迁移或删除本机模型配置。
 
 - 运行入口使用 PATH 中的 Node.js；Python 由 uv 按锁文件准备，随后直接使用该虚拟环境中的解释器。`MODEL_SWITCHER_PYTHON` 已停用；可通过 `MODEL_SWITCHER_UV` 指定 uv 可执行文件，通过 `MODEL_SWITCHER_RUNTIME_DIR` 指定运行环境根目录（绝对路径）。
 - macOS：当前已验证。Linux：配置读写使用 Unix 文件锁，设计上可用，但尚未在 Linux 实机验收。Windows：目前不支持，后端 fcntl 文件锁与 POSIX 权限需要适配；不要直接用于真实配置。

@@ -45,6 +45,7 @@ node dist/setup-runtime.cjs
 源码目录也可使用 `pnpm setup:runtime`。命令最长等待 3 分钟；页面自动准备最多等待 45 秒。网络受限时可预先准备环境，再离线使用。
 
 - 找不到 uv：按 [uv 官方安装说明](https://docs.astral.sh/uv/getting-started/installation/) 安装。桌面进程 PATH 可能不同，启动器会额外查找 `~/.local/bin`，macOS 还查找常见 Homebrew 目录。
+- uv 无法找到锁定的 Python 版本：旧版 uv 的内置下载目录可能不包含该版本。先更新 uv（Homebrew 安装可执行 `brew upgrade uv`），再运行上述 setup 命令；不要降低 `.python-version` 或修改锁文件。
 - 自定义 uv 路径：给 MCP 进程设置 `MODEL_SWITCHER_UV`；显式指定失效时不会改用另一个 uv。
 - 自定义运行目录：设置绝对路径 `MODEL_SWITCHER_RUNTIME_DIR`。不要放在会随升级清理的插件缓存目录。
 - 离线准备：支持 `UV_OFFLINE=1`，但所需 Python 和依赖必须已缓存；没有缓存时明确失败。

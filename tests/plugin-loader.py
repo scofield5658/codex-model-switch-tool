@@ -5,7 +5,7 @@ cli=os.environ.get('TEST_CODEX_BIN','codex')
 market=Path('release/local-marketplace').resolve()
 with tempfile.TemporaryDirectory(prefix='switcher-loader-') as td:
     env={**os.environ,'CODEX_HOME':td}
-    for args in [['plugin','marketplace','add',str(market),'--json'],['plugin','add','codex-model-switcher@local-model-tools','--json']]:
+    for args in [['plugin','marketplace','add',str(market),'--json'],['plugin','add','codex-model-switch-tool@model-switch-plugin','--json']]:
         subprocess.run([cli]+args,env=env,check=True,capture_output=True,text=True)
     p=subprocess.Popen([cli,'app-server','--stdio'],env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
     sel=selectors.DefaultSelector();sel.register(p.stdout,selectors.EVENT_READ);sel.register(p.stderr,selectors.EVENT_READ)

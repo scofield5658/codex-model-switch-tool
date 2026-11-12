@@ -688,5 +688,30 @@
     "zh-Hans": "重试",
     "zh-Hant": "重試",
     "en": "Retry"
+  },
+  "initializing": {
+    "zh-Hans": "正在初始化…",
+    "zh-Hant": "正在初始化…",
+    "en": "Initializing…"
+  },
+  "initializationHint": {
+    "zh-Hans": "首次使用可能需要较长时间，请稍候。",
+    "zh-Hant": "首次使用可能需要較長時間，請稍候。",
+    "en": "First-time setup may take a little longer. Please wait."
+  },
+  "initializationSlow": {
+    "zh-Hans": "仍在初始化，请稍候。",
+    "zh-Hant": "仍在初始化，請稍候。",
+    "en": "Initialization is still in progress. Please wait."
+  },
+  "initializationFailed": {
+    "zh-Hans": "暂时无法完成初始化，请重试。",
+    "zh-Hant": "暫時無法完成初始化，請重試。",
+    "en": "Unable to finish initialization. Please try again."
+  },
+  "errorDetails": {
+    "zh-Hans": "错误详情",
+    "zh-Hant": "錯誤詳情",
+    "en": "Error details"
   }
 }

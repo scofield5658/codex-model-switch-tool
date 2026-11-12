@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil,json,zipfile
 from importlib.metadata import distribution
 root=Path(__file__).resolve().parent.parent
-release=root/'release';market=release/'local-marketplace';target=market/'plugins/codex-model-switcher'
+release=root/'release';market=release/'local-marketplace';target=market/'plugins/codex-model-switch-tool'
 if target.exists(): shutil.rmtree(target)
 target.mkdir(parents=True)
 for filename in ['plugin.json','mcp.json','.mcp.json','README.md','LICENSE','pyproject.toml','uv.lock','.python-version']:
@@ -29,14 +29,14 @@ for file in (root/'node_modules').rglob('LICENSE*'):
     if file.is_file() and file.stat().st_size<200000:
         name=str(file.relative_to(root/'node_modules')).replace('/','_')
         shutil.copy2(file,licenses/name)
-manifest={'name':'local-model-tools','interface':{'displayName':'本地模型工具'},'plugins':[{'name':'codex-model-switcher','source':{'source':'local','path':'./plugins/codex-model-switcher'},'policy':{'installation':'AVAILABLE','authentication':'ON_INSTALL'},'category':'Developer Tools'}]}
+manifest={'name':'model-switch-plugin','interface':{'displayName':'本地模型工具'},'plugins':[{'name':'codex-model-switch-tool','source':{'source':'local','path':'./plugins/codex-model-switch-tool'},'policy':{'installation':'AVAILABLE','authentication':'ON_INSTALL'},'category':'Developer Tools'}]}
 mp=market/'.agents/plugins';mp.mkdir(parents=True,exist_ok=True);(mp/'marketplace.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 version=json.loads((root/'plugin.json').read_text())['version']
-archive=release/('codex-model-switcher-'+version+'.zip')
+archive=release/('codex-model-switch-tool-'+version+'.zip')
 with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
     for file in target.rglob('*'):
         if file.is_file():
             assert not file.is_symlink()
-            z.write(file,Path('codex-model-switcher')/file.relative_to(target))
+            z.write(file,Path('codex-model-switch-tool')/file.relative_to(target))
 print('Packaged:',archive)
 print('Marketplace:',market)

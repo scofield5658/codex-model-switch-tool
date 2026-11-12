@@ -135,3 +135,11 @@ dialog h2 { margin-bottom: 14px; }
 #add-error:empty { display: none; }
 
 #draft-state:empty{display:none}.toolbar>div{margin-left:auto}
+
+.initialization { min-height: 220px; }
+.initialization .loading { display: flex; align-items: flex-start; gap: 14px; padding: 28px 0; }
+.initialization .loading p { margin: 0 0 8px; }
+.loading-spinner { width: 20px; height: 20px; flex: 0 0 20px; border: 2px solid var(--muted); border-right-color: transparent; border-radius: 50%; animation: initialization-spin 1s linear infinite; }
+.initialization-details { margin: 16px 0; overflow-wrap: anywhere; }
+@keyframes initialization-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .loading-spinner { animation: none; } }

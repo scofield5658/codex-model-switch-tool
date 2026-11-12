@@ -170,6 +170,7 @@ async function hostLocale(page,locale){
  await page.evaluate(locale=>window.dispatchEvent(new CustomEvent('fixture:host-context',{detail:{locale}})),locale);
 }
 test('initial configuration failure can be retried inside the page without reloading or writing',async({page})=>{
+ await page.clock.install();
  let reads=0,writes=0;
  await page.route('**/api/provider_save',route=>{writes++;return route.abort();});
  await page.route('**/api/provider_read',route=>{
@@ -178,18 +179,32 @@ test('initial configuration failure can be retried inside the page without reloa
  });
  await page.goto('http://127.0.0.1:43187');
  await expect(page.getByRole('alert')).toBeVisible();
+ await page.getByText('错误详情',{exact:true}).click();
+ await expect(page.locator('.initialization-details')).toContainText('Python 环境准备失败');
+ await page.clock.fastForward(11000);
+ await expect(page.getByRole('alert')).toBeVisible();
  await page.getByRole('button',{name:'重试',exact:true}).click();
  await expect(page.locator('.providers')).toBeVisible();
  await expect(page.getByRole('alert')).toHaveCount(0);
+ await page.clock.fastForward(11000);
+ await expect(page.locator('.providers')).toBeVisible();
  expect(reads).toBe(2);expect(writes).toBe(0);
 });
 
 test('slow first configuration read stays in loading state until data arrives',async({page})=>{
+ await page.clock.install();
  let release;
  const waiting=new Promise(resolve=>{release=resolve;});
  await page.route('**/api/provider_read',async route=>{await waiting;await route.continue();});
  await page.goto('http://127.0.0.1:43187');
  await expect(page.locator('.loading')).toBeVisible();
+ await expect(page.getByRole('status')).toContainText('正在读取本机配置');
+ await expect(page.locator('.loading-spinner')).toBeVisible();
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await expect(page.locator('.loading-spinner')).toHaveCSS('animation-name','none');
+ await page.clock.fastForward(10000);
+ await expect(page.getByRole('status')).toContainText('仍在初始化');
+ await expect(page.locator('h1')).toHaveText('自定义模型配置');
  await expect(page.getByRole('alert')).toHaveCount(0);
  release();
  await expect(page.locator('.providers')).toBeVisible();

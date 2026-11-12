@@ -22,7 +22,7 @@ function changed(p){
 }
 function syncToolbar(){const state=document.querySelector('#draft-state');if(dirty)setText(state,'有未保存修改');else{state.textContent='';delete state.dataset.i18n;}}
 function render(){
- if(!draft){el.innerHTML=`<div class="loading">${h("正在读取本机配置…")}</div>`;return;}
+ if(!draft){renderInitialization();return;}
  el.innerHTML=`<main data-ui-revision="compact-20261112"><header><div><h1>${h("自定义模型配置")}</h1><p>${h("管理接入，选择下次启动使用的模型。")}</p></div><button id="reload" class="quiet">${h("重新加载")}</button></header>
  <section class="toolbar" ${a('aria-label','配置操作')}><span id="draft-state" aria-live="polite">${dirty?h('有未保存修改'):''}</span><div><button id="reset">${h("重置")}</button><button id="save">${h("保存")}</button><button id="restart" class="primary">${h("保存并重启")}</button></div></section>
  <section class="summary"><span>${h("已保存默认")}</span><strong>${esc(saved.selection.provider)} <small>${esc(saved.selection.model)}</small></strong><p>${h("当前运行模型待核实；保存后请重启，并在新聊天中验证。")}</p></section>
@@ -118,12 +118,21 @@ async function save(){
  baseline(data);notice='已保存，下次启动生效。';
 }
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+let initializing=false,initializationPhase='initializing',initializationSlow=false;
+function renderInitialization(){
+ el.innerHTML=`<main class="initialization"><h1>${h('title')}</h1><section class="loading" aria-busy="true"><span class="loading-spinner" aria-hidden="true"></span><div role="status" aria-live="polite"><p>${h(initializationPhase)}</p><p class="help">${h(initializationSlow?'initializationSlow':'initializationHint')}</p></div></section></main>`;
+}
 async function initialize(){
- render();
- try{await connect();baseline(await call('provider_read'));render();}
- catch(e){
-  el.innerHTML=`<main><h1>${h("自定义模型配置")}</h1><p role="alert" class="error">${h(e)}</p><button id="retry-load">${h('retry')}</button></main>`;
+ if(initializing)return;
+ initializing=true;initializationPhase='initializing';initializationSlow=false;
+ renderInitialization();
+ const timer=setTimeout(()=>{initializationSlow=true;renderInitialization();},10000);
+ try{
+  await connect();initializationPhase='loading';renderInitialization();
+  baseline(await call('provider_read'));render();
+ }catch(e){
+  el.innerHTML=`<main class="initialization"><h1>${h('title')}</h1><p role="alert" class="error">${h('initializationFailed')}</p><details class="initialization-details"><summary>${h('errorDetails')}</summary><p>${h(e)}</p></details><button id="retry-load">${h('retry')}</button></main>`;
   document.querySelector('#retry-load').onclick=initialize;
- }
+ }finally{clearTimeout(timer);initializing=false;}
 }
 initialize();
