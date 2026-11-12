@@ -122,7 +122,10 @@ export function createPythonRuntime({root, env = process.env, timeoutMs = 45000}
   return {
     ensure() {
       // Share first initialization; allow a retry after an installation or network failure.
-      pending ??= prepare().catch(error => { pending = undefined; throw error instanceof PythonRuntimeError ? error : failure('pythonSetupFailed'); });
+      pending ??= prepare().catch(error => { pending = undefined; if(error instanceof PythonRuntimeError)throw error;
+        const sanitized=failure('pythonSetupFailed');
+        sanitized.cause={code:error.code,syscall:error.syscall};
+        throw sanitized; });
       return pending;
     },
   };
