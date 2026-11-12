@@ -22,6 +22,6 @@ locales/messages.json 使用稳定语义键，每项包含 en、zh-Hans、zh-Han
 
 ## 验证
 
-31 项 Python 测试、13 项 Playwright 测试通过；MCP 冒烟与实际 Codex plugin loader 通过。覆盖词典完整性与参数一致性、语言标签回退、三语窄屏、切换保留草稿/焦点/弹窗、请求进行中切换、后端错误码以及旧服务错误文本兼容。
+自动化验证包括 Python、Playwright、MCP 冒烟及 Codex plugin loader；最新结果以测试运行记录为准。覆盖词典完整性与参数一致性、语言标签回退、三语窄屏、切换保留草稿/焦点/弹窗、请求进行中切换、后端错误码以及旧服务错误文本兼容。
 
 实际 Codex MCP App 已自动以 zh-Hant 加载，标题为“自訂模型設定”，表单和日期呈现繁体格式。未改动用户模型配置、密钥或客户端语言设置。验证截图只保留本地，不纳入 Git。

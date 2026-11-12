@@ -1,0 +1,30 @@
+name: Cross-platform tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.7'
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --locked --managed-python --no-config
+      - run: pnpm test
+      - run: pnpm build
+      - run: node scripts/build.mjs --test-ui
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright test
+      - run: pnpm package

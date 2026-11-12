@@ -13,7 +13,6 @@ for directory in ['.codex-plugin','assets','backend','locales']:
 for file in ['server.cjs','setup-runtime.cjs','ui.html']:
     shutil.copy2(root/'dist'/file,target/'dist'/file)
 for file in (root/'dist').glob('*.LEGAL.txt'): shutil.copy2(file,target/'dist'/file.name)
-(target/'scripts').mkdir();shutil.copy2(root/'scripts/start.sh',target/'scripts/start.sh')
 (target/'docs').mkdir()
 for file in ['python-runtime.md','i18n-assessment.md']:
     shutil.copy2(root/'docs'/file,target/'docs'/file)
@@ -30,8 +29,8 @@ for file in (root/'node_modules').rglob('LICENSE*'):
         name=str(file.relative_to(root/'node_modules')).replace('/','_')
         shutil.copy2(file,licenses/name)
 manifest={'name':'model-switch-plugin','interface':{'displayName':'本地模型工具'},'plugins':[{'name':'codex-model-switch-tool','source':{'source':'local','path':'./plugins/codex-model-switch-tool'},'policy':{'installation':'AVAILABLE','authentication':'ON_INSTALL'},'category':'Developer Tools'}]}
-mp=market/'.agents/plugins';mp.mkdir(parents=True,exist_ok=True);(mp/'marketplace.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
-version=json.loads((root/'plugin.json').read_text())['version']
+mp=market/'.agents/plugins';mp.mkdir(parents=True,exist_ok=True);(mp/'marketplace.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding="utf-8")
+version=json.loads((root/'plugin.json').read_text(encoding='utf-8'))['version']
 archive=release/('codex-model-switch-tool-'+version+'.zip')
 with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
     for file in target.rglob('*'):

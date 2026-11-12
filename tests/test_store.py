@@ -1,4 +1,4 @@
-import unittest, tempfile, json
+import unittest, tempfile, json, os
 from pathlib import Path
 from backend.store import Store, ConfigError
 
@@ -36,7 +36,7 @@ class StoreTests(unittest.TestCase):
         self.assertIn('private-test-key', text)
         self.assertIn('# keep my settings', text)
         self.assertIn('[mcp_servers.myserver]', text)
-        self.assertEqual(self.config.stat().st_mode & 0o777, 0o600)
+        if os.name != 'nt': self.assertEqual(self.config.stat().st_mode & 0o777, 0o600)
     def test_replacement_is_saved_but_never_returned(self):
         d=self.draft(); d['providers'][0]['key']='replacement-secret'
         result=self.store.save(d)

@@ -1,9 +1,9 @@
 """Preserve user TOML; only explicit saves modify it. Never return saved credentials."""
 import copy
-import fcntl
+import os
+import sys
 import hashlib
 import json
-import os
 import re
 import tempfile
 import time
@@ -11,6 +11,11 @@ from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlsplit
 import tomlkit
+
+if os.name == "nt":
+    import msvcrt
+else:
+    import fcntl
 
 _MESSAGES = json.loads((Path(__file__).resolve().parent.parent/'locales/messages.json').read_text(encoding='utf-8'))
 _MESSAGE_CODES = {row['zh-Hans']: code for code, row in _MESSAGES.items()}
@@ -36,14 +41,14 @@ def digest(text):
 
 def atomic(path, text):
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    fd, temp = tempfile.mkstemp(dir=path.parent, prefix='.'+path.name+'.')
-    try:
-        with os.fdopen(fd, 'w') as out:
-            os.fchmod(out.fileno(), 0o600)
+    # Windows files inherit the private staging directory ACL; rename preserves it.
+    # Python 3.12.13 applies owner/administrator access for mkdir(mode=0o700).
+    with tempfile.TemporaryDirectory(dir=path.parent, prefix='.write-') as staging:
+        fd, temp = tempfile.mkstemp(dir=staging)
+        with os.fdopen(fd, 'w', encoding='utf-8', newline='') as out:
+            if os.name != 'nt': os.fchmod(out.fileno(), 0o600)
             out.write(text); out.flush(); os.fsync(out.fileno())
         os.replace(temp, path)
-    finally:
-        if os.path.exists(temp): os.unlink(temp)
 
 def origin(url):
     u = urlsplit(url)
@@ -97,23 +102,36 @@ class Store:
     @contextmanager
     def locked(self):
         self.dir.mkdir(parents=True,exist_ok=True,mode=0o700)
-        with open(self.dir/'lock','a') as lock:
-            os.chmod(self.dir/'lock',0o600)
-            fcntl.flock(lock,fcntl.LOCK_EX)
-            yield
+        with open(self.dir/'lock','a+b') as lock:
+            if os.name == 'nt':
+                if lock.seek(0, os.SEEK_END) == 0:
+                    lock.write(b'\0'); lock.flush()
+                lock.seek(0)
+                msvcrt.locking(lock.fileno(), msvcrt.LK_LOCK, 1)
+            else:
+                os.chmod(self.dir/'lock',0o600)
+                fcntl.flock(lock,fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                if os.name == 'nt':
+                    lock.seek(0)
+                    msvcrt.locking(lock.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    fcntl.flock(lock,fcntl.LOCK_UN)
     def _read(self):
-        text=self.path.read_text() if self.path.exists() else ''
+        text=self.path.read_text(encoding='utf-8') if self.path.exists() else ''
         try: doc=tomlkit.parse(text)
         except Exception: raise ConfigError('config.toml 格式错误，未读取或修改；请在本地修复。') from None
         journal=self.dir/'transaction.json'
         if journal.exists():
-            tx=json.loads(journal.read_text())
+            tx=json.loads(journal.read_text(encoding='utf-8'))
             if digest(text)==tx['nextHash']:
                 atomic(self.statepath,json.dumps(tx['state'],ensure_ascii=False,indent=2))
             elif digest(text)!=tx['oldHash']:
                 raise ConfigError('上次保存中断且配置已被其他程序修改，请从备份人工核对。')
             journal.unlink()
-        try: state=json.loads(self.statepath.read_text()) if self.statepath.exists() else {}
+        try: state=json.loads(self.statepath.read_text(encoding='utf-8')) if self.statepath.exists() else {}
         except Exception: raise ConfigError('插件状态文件损坏，请先恢复插件状态备份。') from None
         return text,doc,state
     def snapshot(self):
@@ -122,7 +140,7 @@ class Store:
     def _cached(self,id,p):
         credential=p.get('experimental_bearer_token') or os.environ.get(p.get('env_key',''),'')
         path=self.dir/'catalogs'/(digest(id+p.get('base_url','').rstrip('/')+credential)+'.json')
-        try: return json.loads(path.read_text()) if path.exists() else {}
+        try: return json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
         except (ValueError,OSError): return {}
     def _write_catalog(self,id,entry,model,model_options):
         cached=self._cached(id,entry)
@@ -158,7 +176,7 @@ class Store:
         return {'revision':digest(text+'\0'+json.dumps(state,sort_keys=True)), 'providers':providers,
             'selection':{'provider':doc.get('model_provider','openai'),'model':doc.get('model','')},
             'nativeModel':(baseline or {}).get('model',''), 'nativeAvailable':baseline is not None,
-            'runtimeStatus':'unknown','savedAt':state.get('savedAt'), 'templates':[{'id':k,'name':v[0],'baseUrl':v[1],'model':v[2]} for k,v in DEFAULTS.items()]}
+            'canRestart':sys.platform == 'darwin','runtimeStatus':'unknown','savedAt':state.get('savedAt'), 'templates':[{'id':k,'name':v[0],'baseUrl':v[1],'model':v[2]} for k,v in DEFAULTS.items()]}
     def _provider(self,p,doc):
         if not isinstance(p,dict): raise ConfigError('提供商格式错误。')
         id=p.get('id','')
@@ -253,11 +271,11 @@ class Store:
             state['savedAt']=time.strftime('%Y-%m-%dT%H:%M:%S%z')
             backup=self.dir/'backups'/str(time.time_ns())
             atomic(backup.with_suffix('.toml'),text)
-            if self.statepath.exists(): atomic(backup.with_suffix('.json'),self.statepath.read_text())
+            if self.statepath.exists(): atomic(backup.with_suffix('.json'),self.statepath.read_text(encoding='utf-8'))
             tx={'oldHash':digest(text),'nextHash':digest(nexttext),'state':state}
             atomic(self.dir/'transaction.json',json.dumps(tx,ensure_ascii=False))
             # Recheck immediately before commit; plugin instances also share an advisory lock.
-            current=self.path.read_text() if self.path.exists() else ''
+            current=self.path.read_text(encoding='utf-8') if self.path.exists() else ''
             if current!=text:
                 (self.dir/'transaction.json').unlink()
                 raise ConfigError('保存期间配置发生变化，已停止写入。')

@@ -65,6 +65,6 @@ node dist/setup-runtime.cjs
 
 回退时恢复上一版本的源码与三份环境文件并重新构建，启动器会选择对应旧环境。运行中的其他版本可能仍在使用旧目录，暂不自动清理；确认进程退出且不再需要回退后，可手动清理对应目录。
 
-uv 支持跨平台不等于插件完整支持跨平台：macOS 已验证；Linux 尚需实机验证；Windows 仍需适配 `fcntl` 文件锁与 POSIX 文件权限。
+核心配置操作已适配 macOS、Linux 和 Windows。Windows 使用字节范围锁及私有暂存目录 ACL，文件与进程通信统一 UTF-8；自动重启仅限 macOS，其他系统保存后手动重启。三系统验证由 CI 执行，桌面宿主页面仍需各平台实机验收。
 
 参考：[uv 项目结构](https://docs.astral.sh/uv/concepts/projects/layout/)、[Python 版本管理](https://docs.astral.sh/uv/concepts/python-versions/)、[项目环境路径](https://docs.astral.sh/uv/concepts/projects/config/#project-environment-path)。

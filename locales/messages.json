@@ -713,5 +713,15 @@
     "zh-Hans": "错误详情",
     "zh-Hant": "錯誤詳情",
     "en": "Error details"
+  },
+  "saveManualRestart": {
+    "en": "Save, then restart manually",
+    "zh-Hans": "保存后手动重启",
+    "zh-Hant": "儲存後手動重新啟動"
+  },
+  "manualRestartSaved": {
+    "en": "Saved. Quit and reopen Codex manually, then start a new chat.",
+    "zh-Hans": "已保存。请手动退出并重新打开 Codex，然后新建聊天。",
+    "zh-Hant": "已儲存。請手動退出並重新開啟 Codex，然後建立新聊天。"
   }
 }

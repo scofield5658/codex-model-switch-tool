@@ -275,3 +275,18 @@ test('translated layouts fit narrow screens and screenshots show all three langu
   await page.locator('[data-action=edit]').first().click();
  }
 });
+
+test('manual restart platform saves without offering automatic restart',async({page})=>{
+ await page.route('**/api/provider_read',async route=>{
+  const response=await route.fetch();const body=await response.json();body.data.canRestart=false;
+  await route.fulfill({json:body});
+ });
+ await page.route('**/api/provider_save',async route=>{
+  const response=await route.fetch();const body=await response.json();body.data.canRestart=false;
+  await route.fulfill({json:body});
+ });
+ await page.goto('http://127.0.0.1:43187');
+ await page.getByRole('button',{name:'保存后手动重启',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('请手动退出');
+ await expect(page.locator('#restart-dialog')).not.toBeVisible();
+});

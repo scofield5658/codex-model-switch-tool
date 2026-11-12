@@ -23,7 +23,7 @@ test('managed Python survives plugin relocation, ignores ambient Python, and reu
   await exec(concurrent, ['-I', '-c', 'import tomlkit']);
   assert(python.startsWith(env.MODEL_SWITCHER_RUNTIME_DIR + path.sep));
   const {stdout} = await exec(python, ['-I', '-c', 'import sys,tomlkit; print(sys.version.split()[0]); print(tomlkit.__version__); print(sys.prefix != sys.base_prefix)']);
-  assert.deepEqual(stdout.trim().split('\n'), ['3.12.13', '0.13.3', 'True']);
+  assert.deepEqual(stdout.trim().split(/\r?\n/), ['3.12.13', '0.13.3', 'True']);
   const active = await create({root, env}).ensure();
   const before = (await stat(active)).mtimeMs;
   const moved = path.join(temp, 'relocated plugin');
@@ -93,7 +93,7 @@ test('missing metadata and relative runtime directories fail with actionable cod
   await assert.rejects(create({root, env: {...process.env, MODEL_SWITCHER_RUNTIME_DIR: blocked}}).ensure(), {code: 'pythonSetupFailed'});
 });
 
-test('uv setup is time bounded and subprocess diagnostics are not exposed', async t => {
+test('uv setup is time bounded and subprocess diagnostics are not exposed', {skip:process.platform==='win32'?'POSIX shebang fixture':false}, async t => {
   const temp = await mkdtemp(path.join(tmpdir(), 'switcher-timeout-'));
   t.after(() => rm(temp, {recursive: true, force: true}));
   const fakeUv = path.join(temp, 'uv');
@@ -120,7 +120,7 @@ test('concurrent recovery never exposes another repair process to partially inst
   assert.equal(results.filter(r => r.status === 'rejected').length, 0, 'Every concurrent request must receive a complete environment');
 });
 
-test('a stalled uv version probe is reported as timeout rather than missing uv', async t => {
+test('a stalled uv version probe is reported as timeout rather than missing uv', {skip:process.platform==='win32'?'POSIX shebang fixture':false}, async t => {
   const temp = await mkdtemp(path.join(tmpdir(), 'switcher-probe-timeout-'));
   t.after(() => rm(temp, {recursive: true, force: true}));
   const fakeUv = path.join(temp, 'uv');

@@ -15,7 +15,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.method!=='POST'||!command){res.writeHead(404);res.end();return;}
   let body='';for await(const chunk of req){body+=chunk;if(body.length>512000)throw new Error('large');}
   const child=spawn(python,['-E','-s','-m','backend.main'],{env:{...pythonEnvironment(),CODEX_HOME:home},stdio:['pipe','pipe','inherit']});
-  let out='';child.stdout.on('data',x=>out+=x);child.on('close',()=>{res.setHeader('Content-Type','application/json');res.end(out);});
+  let out='';child.stdout.on('data',x=>out+=x);child.on('close',()=>{res.setHeader('Content-Type','application/json');const result=JSON.parse(out);if(result.ok)result.data.canRestart=true;res.end(JSON.stringify(result));});
   child.stdin.end(JSON.stringify({command,args:JSON.parse(body)}));
  }catch{res.writeHead(500);res.end('{}');}
 });

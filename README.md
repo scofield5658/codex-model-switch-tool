@@ -1,6 +1,6 @@
 # 自定义模型配置 · Codex 本地插件
 
-管理 provider、API Key 和默认模型；支持模型列表查询、重置、可选连接测试、Raw Data、保存和保存并重启。适用于 macOS 本地桌面端；不代理推理请求，不改变订阅权益。
+管理 provider、API Key 和默认模型；支持模型列表查询、重置、可选连接测试、Raw Data、保存和保存并重启。面向 macOS、Windows、Linux 的本地 Codex 配置（图形页面需要宿主支持 MCP Apps）；不代理推理请求，不改变订阅权益。
 
 ## 界面预览
 
@@ -19,7 +19,7 @@
 1. 展开提供商，可直接编辑“配置名称”、接入地址、默认模型。已有 Key 只显示“已配置”，不会回填；输入框留空始终保留原密钥。
 2. “刷新模型”从服务商查询模型列表。失败时已有列表保留，可手动输入准确模型 ID。列表出现不代表模型调用权限已验证。
 3. “设为默认”选择下次启动的 provider。保存前可以重置（保留编辑并恢复最近保存值）。此操作均不写入磁盘。
-4. 重置、保存与保存并重启位于顶部操作栏，滚动时保持可见。“保存”写入配置；“保存并重启”要求明确确认各窗口任务已结束，随后正常退出并重新打开客户端，不强制结束进程。若退出被系统拒绝，手动重启即可。
+4. 重置、保存与保存并重启位于顶部操作栏，滚动时保持可见。“保存”写入配置；macOS 的“保存并重启”要求明确确认各窗口任务已结束，随后正常退出并重新打开客户端，不强制结束进程。Windows/Linux 显示“保存后手动重启”，保存后给出操作提示。若退出被系统拒绝，手动重启即可。
 5. 重启后新建聊天验证。插件无法可靠读取桌面运行中的模型/provider，旧聊天可能保留原值；不会把文件内容当成当前运行结果。
 
 内置 GPT 为固定选项，恢复首次外部切换前的原生设置；原生设置激活期间的外部人工修改也会被保留。若首次使用插件时已经选中了外部服务且没有记录原生配置，自动恢复按钮不可用，需先在本机恢复原生设置再读取。
@@ -65,14 +65,14 @@
 
 - Codex 文件：`~/.codex/config.toml`（或进程的 CODEX_HOME）。
 - 插件状态、模型缓存、生成目录及备份：`~/.codex/model-switcher/`。
-- 凭证按现有 Codex 方式保存在本机 TOML；不是 Keychain 加密存储。文件及备份为 0600，不打包上传。
+- 凭证按现有 Codex 方式保存在本机 TOML；不是 Keychain 加密存储。POSIX 文件及备份为 0600；Windows 写入文件继承私有暂存目录的当前用户/管理员 ACL，不将 chmod 当成 ACL。不打包上传。
 - 写入前备份、修订号检查、进程锁、原子替换；中断事务会在下次读取时恢复。其他程序不遵守锁时，最后检查和写入之间仍存在极短并发窗口。
 - 保存后需要历史回滚时，备份位于 `model-switcher/backups`。先退出 Codex，核对对应 `.toml` 与 `.json`，恢复配置与插件状态；不要直接覆盖期间新增的其他设置。
 - 本插件不处理项目配置/profile/命令行覆盖，实际加载结果仍以客户端为准。
 
 ## 开发与验证
 
-需要 Node.js 22+、pnpm 10.33.0 和 [uv](https://docs.astral.sh/uv/getting-started/installation/)（本项目验证版本 0.11.2）。Python 3.12.13 由 uv 管理，无需自行配置系统 Python。JavaScript 使用 `pnpm-lock.yaml`；Python 使用 `pyproject.toml`、`uv.lock`、`.python-version`。
+需要 Node.js 22+、pnpm 10.33.0 和 [uv](https://docs.astral.sh/uv/getting-started/installation/)（本项目验证版本 0.13.7）。Python 3.12.13 由 uv 管理，无需自行配置系统 Python。JavaScript 使用 `pnpm-lock.yaml`；Python 使用 `pyproject.toml`、`uv.lock`、`.python-version`。
 
 ```sh
 uv sync --locked --managed-python --no-config
@@ -88,7 +88,7 @@ pnpm package
 uv run --locked --managed-python --no-config python tests/plugin-loader.py
 ```
 
-`pnpm build`、`pnpm test`、`pnpm package` 均通过 uv 进入项目 `.venv`。`--locked` 要求依赖声明和锁文件一致，不会自动升级依赖；`--no-config` 避免继承机器上的 uv 配置文件。旧的 `requirements.txt` 和复制到 `backend/vendor` 的依赖已停用。Python 环境细节与升级步骤见 [Python 环境管理](docs/python-runtime.md)。
+`pnpm build`、`pnpm test`、`pnpm package` 均通过 uv 进入项目 `.venv`。`--locked` 要求依赖声明和锁文件一致，不会自动升级依赖；`--no-config` 避免继承机器上的 uv 配置文件。Python 环境细节与升级步骤见 [Python 环境管理](docs/python-runtime.md)。
 
 浏览器测试默认使用 Playwright Chromium，只访问临时配置。所有测试均不使用真实 Key、不发起真实收费调用、不重启当前客户端。重启辅助程序使用受控命令替身验证流程；真实客户端退出/重新启动需用户执行按钮后验收。
 
@@ -115,11 +115,9 @@ codex plugin add codex-model-switch-tool@model-switch-plugin
 旧版本使用 `codex-model-switcher@local-model-tools`；新标识会被视为不同插件，不会原地替换旧安装。已有用户请先移除旧插件，再按上述命令添加新版 marketplace 并安装新插件，避免两个入口同时存在。此命名调整不迁移或删除本机模型配置。
 
 - 运行入口使用 PATH 中的 Node.js；Python 由 uv 按锁文件准备，随后直接使用该虚拟环境中的解释器。`MODEL_SWITCHER_PYTHON` 已停用；可通过 `MODEL_SWITCHER_UV` 指定 uv 可执行文件，通过 `MODEL_SWITCHER_RUNTIME_DIR` 指定运行环境根目录（绝对路径）。
-- macOS：当前已验证。Linux：配置读写使用 Unix 文件锁，设计上可用，但尚未在 Linux 实机验收。Windows：目前不支持，后端 fcntl 文件锁与 POSIX 权限需要适配；不要直接用于真实配置。
+- 核心配置读写、模型查询与连接测试已适配 macOS、Windows、Linux：Unix 使用 flock，Windows 使用字节范围锁；文件与进程通信使用 UTF-8。三系统测试配置见 `.github/workflows/test.yml`，实际通过状态以 CI 为准；当前本地验收系统为 macOS。
 - 自动重启仅支持 macOS，通过 bundle ID 查找客户端，不依赖安装目录；其他系统需手动重启。
-- UI 测试默认使用 Playwright Chromium（先执行 pnpm exec playwright install chromium）。也可设置 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH 使用本机 Chromium/Chrome。
 - 实际插件加载测试使用 PATH 中的 codex，可通过 TEST_CODEX_BIN 指定。
-- 生成 dist 与 release：先运行 `pnpm build`，再运行 `pnpm package`。
 - 仓库不收录用户配置、密钥、历史调试材料或依赖目录。`docs/images` 仅收录已确认可公开的界面示例，其他本地截图继续忽略。
 - 项目采用 [MIT License](LICENSE)。
 

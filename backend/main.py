@@ -22,6 +22,8 @@ def execute(command,args):
     raise ConfigError('未知操作。')
 
 if __name__=='__main__':
+    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8')
     try:
         incoming=sys.stdin.read(512*1024+1)
         if len(incoming)>512*1024: raise ConfigError('请求过大。')

@@ -24,7 +24,7 @@ function syncToolbar(){const state=document.querySelector('#draft-state');if(dir
 function render(){
  if(!draft){renderInitialization();return;}
  el.innerHTML=`<main data-ui-revision="compact-20261112"><header><div><h1>${h("自定义模型配置")}</h1><p>${h("管理接入，选择下次启动使用的模型。")}</p></div><button id="reload" class="quiet">${h("重新加载")}</button></header>
- <section class="toolbar" ${a('aria-label','配置操作')}><span id="draft-state" aria-live="polite">${dirty?h('有未保存修改'):''}</span><div><button id="reset">${h("重置")}</button><button id="save">${h("保存")}</button><button id="restart" class="primary">${h("保存并重启")}</button></div></section>
+ <section class="toolbar" ${a('aria-label','配置操作')}><span id="draft-state" aria-live="polite">${dirty?h('有未保存修改'):''}</span><div><button id="reset">${h("重置")}</button><button id="save">${h("保存")}</button><button id="restart" class="primary">${h(draft.canRestart===false?'saveManualRestart':'保存并重启')}</button></div></section>
  <section class="summary"><span>${h("已保存默认")}</span><strong>${esc(saved.selection.provider)} <small>${esc(saved.selection.model)}</small></strong><p>${h("当前运行模型待核实；保存后请重启，并在新聊天中验证。")}</p></section>
  <div id="messages">${failure?`<p role="alert" class="error">${h(failure)}</p>`:''}${notice?`<p role="status" class="notice">${h(notice)}</p>`:''}</div>
  <section class="providers" ${a('aria-label','提供商列表')}>
@@ -57,7 +57,7 @@ function bind(){
  document.querySelector('#native').onclick=()=>{draft.selection={provider:'openai',model:draft.nativeModel};dirty=true;render();};
  document.querySelector('#reset').onclick=()=>{draft=clone(saved);raws={};deleted=[];dirty=false;results={};if(!draft.providers.some(p=>p.id===editing))editing=null;clearMessage();render();};
  document.querySelector('#save').onclick=()=>run(save);
- document.querySelector('#restart').onclick=()=>document.querySelector('#restart-dialog').showModal();
+ document.querySelector('#restart').onclick=()=>{if(draft.canRestart===false){run(async()=>{await save();notice='manualRestartSaved';});return;}document.querySelector('#restart-dialog').showModal();};
  document.querySelector('#idle').onchange=e=>document.querySelector('#confirm-restart').disabled=!e.target.checked;
  document.querySelector('#dismiss-restart').onclick=()=>document.querySelector('#restart-dialog').close();
  document.querySelector('#confirm-restart').onclick=()=>{document.querySelector('#restart-dialog').close();run(async()=>{await save();const r=await call('provider_restart',{revision:saved.revision,confirmedIdle:true});notice=message('restartScheduled');});};
