@@ -1,0 +1,3 @@
+# esbuild needs its platform binary installed during dependency setup.
+onlyBuiltDependencies:
+  - esbuild
