@@ -117,7 +117,7 @@ test('concurrent recovery never exposes another repair process to partially inst
     await exec(ready, ['-I', '-c', 'import tomlkit.container,tomlkit._utils']);
     return ready;
   }));
-  assert.equal(results.filter(r => r.status === 'rejected').length, 0, 'Every concurrent request must receive a complete environment');
+  assert.equal(results.filter(r => r.status === 'rejected').length, 0, 'Every concurrent request must receive a complete environment: '+JSON.stringify(results.filter(r=>r.status==='rejected').map(r=>({code:r.reason.code,cause:r.reason.cause}))));
 });
 
 test('a stalled uv version probe is reported as timeout rather than missing uv', {skip:process.platform==='win32'?'POSIX shebang fixture':false}, async t => {

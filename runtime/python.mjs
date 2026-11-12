@@ -4,6 +4,7 @@ import {mkdir, readFile, writeFile, rename, rm} from 'node:fs/promises';
 import {homedir} from 'node:os';
 import path from 'node:path';
 import {promisify} from 'node:util';
+import {setTimeout as delay} from 'node:timers/promises';
 
 const exec = promisify(execFile);
 const metadata = ['pyproject.toml', 'uv.lock', '.python-version'];
@@ -113,10 +114,21 @@ export function createPythonRuntime({root, env = process.env, timeoutMs = 45000}
     }
     // Reuse a winner published while uv was running. Only remove our own unpublished generation.
     const winner = await existing();
-    if (winner) { await rm(owned, {recursive: true, force: true}); return winner; }
+    const discardOwned = () => rm(owned, {recursive:true,force:true,maxRetries:3,retryDelay:100}).catch(()=>{});
+    if (winner) { await discardOwned(); return winner; }
     const temp = marker + '.' + randomUUID();
-    try { await writeFile(temp, generation, {mode: 0o600}); await rename(temp, marker); }
-    finally { await rm(temp, {force: true}); }
+    try {
+      await writeFile(temp, generation, {mode: 0o600});
+      for (;;) {
+        try { await rename(temp, marker); break; }
+        catch (error) {
+          const published = await existing();
+          if (published) { await discardOwned(); return published; }
+          if (process.platform !== 'win32' || !['EPERM','EACCES','EBUSY'].includes(error.code)) throw error;
+          await delay(remaining(100));
+        }
+      }
+    } finally { await rm(temp, {force:true}).catch(()=>{}); }
     return python;
   }
   return {
