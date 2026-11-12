@@ -26,7 +26,7 @@ license_file=next(file for file in tomlkit.files if file.name=='LICENSE')
 shutil.copy2(tomlkit.locate_file(license_file),licenses/'tomlkit-LICENSE')
 for file in (root/'node_modules').rglob('LICENSE*'):
     if file.is_file() and file.stat().st_size<200000:
-        name=str(file.relative_to(root/'node_modules')).replace('/','_')
+        name=file.relative_to(root/'node_modules').as_posix().replace('/','_')
         shutil.copy2(file,licenses/name)
 manifest={'name':'model-switch-plugin','interface':{'displayName':'本地模型工具'},'plugins':[{'name':'codex-model-switch-tool','source':{'source':'local','path':'./plugins/codex-model-switch-tool'},'policy':{'installation':'AVAILABLE','authentication':'ON_INSTALL'},'category':'Developer Tools'}]}
 mp=market/'.agents/plugins';mp.mkdir(parents=True,exist_ok=True);(mp/'marketplace.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding="utf-8")
