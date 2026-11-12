@@ -2,6 +2,7 @@ import {t,h,a,message,remoteError,setText,setTranslatedAttribute,localize} from 
 import {bindModelPicker} from './model-picker.js';
 import {connect,call} from './transport.js';
 import './style.css';
+import {reasoningEditor,bindReasoning} from './reasoning.js';
 const el=document.querySelector('#app');
 let saved,draft,editing=null,deleted=[],raws={},busy=false,dirty=false,results={},notice='',failure='';
 const clone=x=>structuredClone(x);
@@ -45,8 +46,22 @@ function card(p){
  <label>${h("接入地址")}<input data-field="baseUrl" value="${esc(p.baseUrl)}" type="url" autocomplete="off" spellcheck="false"></label>
  <label>API Key<input data-field="key" type="password" value="${esc(p.key||'')}" ${a('placeholder',p.keyConfigured?'keepKey':'enterKey')} autocomplete="new-password" ${p.authEditable===false?'disabled':''}></label><p class="help">${h(p.keyConfigured?'已配置，保存的密钥不会再次展示。':'密钥只保存在本机配置中。')}</p>
  <div class="field"><label for="model-${esc(p.id)}">${h("默认模型")}</label><div class="model-row"><div class="model-picker"><input id="model-${esc(p.id)}" data-field="model" value="${esc(p.model)}" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="options-${esc(p.id)}" ${a('placeholder','选择或输入模型 ID')} autocomplete="off"><button type="button" class="model-toggle" ${a('aria-label','展开模型列表')}><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="model-options" id="options-${esc(p.id)}" role="listbox" popover></div></div><button data-action="models">${h("刷新模型")}</button></div></div><p class="help">${p.modelsAt?h('modelsUpdated',{date:p.modelsAt}):h('modelsHint')}</p>
+ <div class="reasoning-editor">${reasoningContent(p)}</div>
  <div class="health-row"><button data-action="health" ${!healthConfigured(p)?'disabled':''}>${h("测试连接")}</button>${healthFeedback(p)}</div>
  <details><summary>${h("高级配置")}<span>Raw Data</span></summary><p class="help">${h('rawHint')}</p><textarea ${a('aria-label','高级配置 JSON')} data-field="raw" spellcheck="false">${esc(raw(p))}</textarea><button data-action="health-template">${h("填入连接测试示例")}</button></details></div>`:''}</article>`;
+}
+function reasoningContent(p){try{return reasoningEditor(parse(p));}catch{return `<p class="help">${h('reasoningRawInvalid')}</p>`;}}
+function refreshReasoning(container,p){
+ const pane=container.querySelector('.reasoning-editor');if(!pane)return;
+ const expanded=pane.querySelector('details')?.open;
+ pane.innerHTML=reasoningContent(p);
+ if(expanded&&pane.querySelector('details'))pane.querySelector('details').open=true;
+ bindReasoning(pane,()=>parse(p),extra=>{
+  raws[p.id]=JSON.stringify(extra,null,2);
+  const rawInput=container.querySelector('[data-field="raw"]');if(rawInput)rawInput.value=raws[p.id];
+  changed(p);refreshReasoning(container,p);
+ });
+ localize(pane);
 }
 function healthFeedback(p){
  const result=results[p.id];
@@ -83,11 +98,13 @@ function bind(){
    const field=input.dataset.field;
    if(field==='raw')raws[p.id]=input.value;else p[field]=input.value;
    if(field==='baseUrl')p.confirmOriginChange=false;
+   if(['model','baseUrl','raw'].includes(field))refreshReasoning(container,p);
    if(field==='model'&&draft.selection.provider===p.id)draft.selection.model=p.model;
    changed(p);
    const healthButton=container.querySelector('[data-action="health"]');healthButton.disabled=!healthConfigured(p);
    setText(container.querySelector('.health-row > span'),connectionHint(p));
   };
+  refreshReasoning(container,p);
   if(container.querySelector('.model-picker'))bindModelPicker(container,p);
   for(const b of container.querySelectorAll('[data-action]'))b.onclick=()=>{
    switch(b.dataset.action){

@@ -4,7 +4,7 @@ import {applyHostContext} from './host-context.js';
 let app,connection;
 export async function connect(){
  if(!connection){
-  const next=new App({name:'Model Switcher',version:'0.1.3'},{});
+  const next=new App({name:'Model Switcher',version:'0.1.4'},{});
   next.onhostcontextchanged=applyHostContext;
   app=next;
   connection=next.connect().then(()=>applyHostContext(next.getHostContext()??{})).catch(async error=>{

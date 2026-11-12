@@ -334,3 +334,41 @@ test('new provider template supplies only the URL',async({page})=>{
  await card.getByRole('option',{name:'user-model',exact:true}).click();
  await expect(card.locator('[data-field=model]')).toHaveValue('user-model');
 });
+
+test('official reasoning levels, per-model overrides and raw JSON stay synchronized',async({page})=>{
+ await page.goto('http://127.0.0.1:43187');
+ const card=page.locator('[data-id="moonshotai-cn"]');
+ await card.getByRole('button',{name:'编辑',exact:true}).click();
+ await expect(card.locator('[data-reasoning="effort"] option')).toHaveText(['使用模型默认值 · max','low','high','max']);
+ await card.locator('[data-reasoning="effort"]').selectOption('high');
+ await card.getByText('Raw Data',{exact:true}).click();
+ let raw=JSON.parse(await card.locator('[data-field="raw"]').inputValue());
+ expect(raw.model.model_reasoning_effort).toBe('high');
+ await card.locator('[data-field="model"]').fill('custom-model');
+ await card.getByText('当前模型的推理能力',{exact:true}).click();
+ await card.locator('[data-level="medium"]').check();
+ await card.locator('[data-level="high"]').check();
+ await card.locator('[data-reasoning="default"]').selectOption('high');
+ await card.locator('[data-reasoning="effort"]').selectOption('');
+ raw=JSON.parse(await card.locator('[data-field="raw"]').inputValue());
+ expect(raw.model_capabilities['custom-model']).toEqual({reasoning_levels:['medium','high'],default_reasoning_level:'high'});
+ expect(raw.model.model_reasoning_effort).toBeUndefined();
+ await card.locator('[data-field="model"]').fill('kimi-k3');
+ await expect(card.locator('[data-reasoning="effort"] option')).toHaveText(['使用模型默认值 · max','low','high','max']);
+ await page.getByRole('button',{name:'重置',exact:true}).click();
+});
+
+test('BigModel is alongside existing templates and does not prefill a model',async({page})=>{
+ await page.goto('http://127.0.0.1:43187');
+ await page.locator('#add').click();
+ await expect(page.locator('#template option')).toHaveCount(5);
+ await page.locator('#template').selectOption('bigmodel-cn');
+ await page.locator('#confirm-add').click();
+ const card=page.locator('[data-id="bigmodel-cn"]');
+ await expect(card.locator('[data-field="baseUrl"]')).toHaveValue('https://open.bigmodel.cn/api/v1');
+ await expect(card.locator('[data-field="model"]')).toHaveValue('');
+ await expect(card.locator('[data-reasoning="effort"]')).toBeDisabled();
+ await card.locator('[data-field="model"]').fill('glm-5.3');
+ await expect(card.locator('[data-reasoning="effort"] option')).toHaveText(['使用模型默认值 · max','low','high','max']);
+ await page.getByRole('button',{name:'重置',exact:true}).click();
+});

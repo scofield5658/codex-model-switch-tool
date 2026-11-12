@@ -1,0 +1,6 @@
+[
+  {"urls":["https://api.moonshot.cn/v1","https://api.moonshot.ai/v1"],"models":["kimi-k3"],"reasoning_levels":["low","high","max"],"default_reasoning_level":"max","source":"https://github.com/MoonshotAI/Kimi-K3#6-model-usage"},
+  {"urls":["https://api.kimi.com/coding/v1","https://api.kimi.ai/coding/v1"],"models":["k3","k3-256k","k3.1-pro","k3.1-pro-highspeed"],"reasoning_levels":["low","high","max"],"default_reasoning_level":"high","source":"https://www.kimi.com/code/docs/third-party-tools/codex.html"},
+  {"urls":["https://api.kimi.com/coding/v1","https://api.kimi.ai/coding/v1"],"models":["kimi-for-coding"],"reasoning_levels":["low","high","max"],"default_reasoning_level":"max","source":"https://www.kimi.com/code/docs/third-party-tools/codex.html"},
+  {"urls":["https://api.z.ai/api/v1","https://open.bigmodel.cn/api/v1"],"models":["glm-5.3"],"reasoning_levels":["low","high","max"],"default_reasoning_level":"max","source":"https://docs.bigmodel.cn/cn/coding-plan/tool/codex"}
+]

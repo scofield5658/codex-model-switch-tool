@@ -128,3 +128,37 @@ codex plugin add codex-model-switch-tool@model-switch-plugin
 ## 作者
 
 [guoz5658](https://github.com/scofield5658) · guoz5658@outlook.com
+
+## 推理强度与模型能力
+
+编辑提供商时，默认模型下方可选择推理强度。“使用模型默认值”采用该模型能力声明中的默认档位；展开“当前模型的推理能力”可配置自定义模型支持的档位及默认值。保存并重启后，可在 Codex 模型菜单中选择声明的档位。旧聊天可能仍携带旧值，首次切换建议新建聊天。
+
+官方预设只按精确接入地址和模型 ID 匹配，更新时间为 2026-11-12：
+
+| 接入 | 模型 ID | 推理档位 | 默认值 |
+| --- | --- | --- | --- |
+| Moonshot 开放平台 | `kimi-k3` | low / high / max | max |
+| Kimi Code | `k3`、`k3-256k`、`k3.1-pro`、`k3.1-pro-highspeed` | low / high / max | high |
+| Kimi Code | `kimi-for-coding` | low / high / max | max |
+| Z.AI / BigModel（智谱中国） | `glm-5.3` | low / high / max | max |
+
+依据：[Moonshot K3](https://github.com/MoonshotAI/Kimi-K3#6-model-usage)、[Kimi Code 的 Codex 配置](https://www.kimi.com/code/docs/third-party-tools/codex.html)、[Z.AI Codex 配置](https://docs.z.ai/devpack/tool/codex)、[BigModel Codex 配置](https://docs.bigmodel.cn/cn/coding-plan/tool/codex)。BigModel 预置地址为 `https://open.bigmodel.cn/api/v1`；与现有三个模板并列，新增时仍不填充模型、Key 或测试请求。
+
+未知模型不猜测档位。自定义能力按模型 ID 保存在 Raw Data 的 `model_capabilities`，例如：
+
+```json
+{
+  "model_capabilities": {
+    "my-model": {
+      "reasoning_levels": ["low", "high"],
+      "default_reasoning_level": "high"
+    }
+  }
+}
+```
+
+可声明 Codex 接受的 `none/minimal/low/medium/high/xhigh/max/ultra` 的子集；非空档位必须含有默认值，空列表表示未提供可切换档位。`model.model_reasoning_effort` 保留为启动覆盖值，不属于当前模型声明的值会在切换保存及 Responses 连接测试前被拒绝。连接测试使用同一有效推理强度，测试 body 中的冲突参数须先修改。
+
+这里的“映射”是服务端协议兼容：Codex 原样发送 `reasoning.effort`，插件不转换请求，也不会把所有厂商的同名档位视为相同计算量。BigModel 的 [Responses 文档](https://docs.bigmodel.cn/cn/guide/develop/responses/introduction) 描述了服务端档位转换；内置菜单采用其 Codex 专用示例。若自定义服务只接受 `thinking.type` 或 token budget，需由该服务提供 Responses 兼容层，不能在插件里仅改名称来实现转换。
+
+能力写入插件生成的模型目录。已有 `model_catalog_json` 用户文件或 `model_catalog_url` 保持原样，菜单能力须在该外部目录维护。生成目录需要的档位会补充到 `desktop.enabled-reasoning-efforts`；切回内置 GPT 时恢复之前的字段，保留其他 desktop 设置和之后的外部修改。宿主版本或账号可见性设置仍可能影响菜单展示。

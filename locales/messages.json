@@ -360,9 +360,9 @@
     "en": "Remote services must use HTTPS."
   },
   "rawSections": {
-    "zh-Hans": "Raw Data 只支持 provider、model、discovery、health。",
-    "zh-Hant": "Raw Data 僅支援 provider、model、discovery、health。",
-    "en": "Raw Data supports only provider, model, discovery and health."
+    "zh-Hans": "Raw Data 只支持 provider、model、discovery、health、model_capabilities。",
+    "zh-Hant": "Raw Data 僅支援 provider、model、discovery、health、model_capabilities。",
+    "en": "Raw Data supports only provider, model, discovery and health, model_capabilities."
   },
   "rawFields": {
     "zh-Hans": "Raw Data 包含不支持的字段；凭证和认证命令不能在这里编辑。",
@@ -723,5 +723,70 @@
     "en": "Saved. Quit and reopen Codex manually, then start a new chat.",
     "zh-Hans": "已保存。请手动退出并重新打开 Codex，然后新建聊天。",
     "zh-Hant": "已儲存。請手動退出並重新開啟 Codex，然後建立新聊天。"
+  },
+  "reasoningEffort": {
+    "zh-Hans": "推理强度",
+    "zh-Hant": "推理強度",
+    "en": "Reasoning effort"
+  },
+  "reasoningDefault": {
+    "zh-Hans": "使用模型默认值",
+    "zh-Hant": "使用模型預設值",
+    "en": "Use model default"
+  },
+  "reasoningHint": {
+    "zh-Hans": "保存并重启后，可在 Codex 模型菜单中动态选择已声明的档位；已有聊天可能保留旧值。",
+    "zh-Hant": "儲存並重新啟動後，可在 Codex 模型選單中動態選擇已宣告的檔位；既有聊天可能保留舊值。",
+    "en": "After saving and restarting, choose declared levels in the Codex model menu. Existing chats may retain their previous effort."
+  },
+  "reasoningCapabilities": {
+    "zh-Hans": "当前模型的推理能力",
+    "zh-Hant": "目前模型的推理能力",
+    "en": "Reasoning capabilities for this model"
+  },
+  "reasoningLevels": {
+    "zh-Hans": "支持的档位",
+    "zh-Hant": "支援的檔位",
+    "en": "Supported levels"
+  },
+  "reasoningCapabilityDefault": {
+    "zh-Hans": "模型默认档位",
+    "zh-Hant": "模型預設檔位",
+    "en": "Default level for this model"
+  },
+  "reasoningReset": {
+    "zh-Hans": "恢复官方预设／未声明",
+    "zh-Hant": "恢復官方預設／未宣告",
+    "en": "Restore official preset / undeclared"
+  },
+  "reasoningMappingHint": {
+    "zh-Hans": "按接入服务文档声明实际支持的值。这里只配置当前模型的菜单与默认值，不转换请求参数。自定义服务的映射由其服务端负责；外部模型目录需自行维护。",
+    "zh-Hant": "依接入服務文件宣告實際支援的值。此處僅設定目前模型的選單與預設值，不轉換請求參數。自訂服務的映射由其伺服器負責；外部模型目錄需自行維護。",
+    "en": "Declare values accepted by your endpoint. These settings control this model’s menu and default; they do not transform requests. Custom endpoints handle their own mappings. External catalogs must be maintained separately."
+  },
+  "reasoningRawInvalid": {
+    "zh-Hans": "请先修正高级配置 JSON，再编辑推理能力。",
+    "zh-Hant": "請先修正進階設定 JSON，再編輯推理能力。",
+    "en": "Fix the advanced JSON before editing reasoning capabilities."
+  },
+  "reasoningUnsupported": {
+    "zh-Hans": "当前模型不支持所选推理强度，请修改推理配置。",
+    "zh-Hant": "目前模型不支援所選推理強度，請修改推理設定。",
+    "en": "This model does not support the selected reasoning effort. Update its reasoning settings."
+  },
+  "reasoningSchema": {
+    "zh-Hans": "模型能力配置无效：档位不能重复，默认值必须属于支持的档位。",
+    "zh-Hant": "模型能力設定無效：檔位不能重複，預設值必須屬於支援的檔位。",
+    "en": "Invalid model capabilities: levels must be unique and the default must be a supported level."
+  },
+  "healthReasoningConflict": {
+    "zh-Hans": "连接测试模型或推理参数与当前配置不一致。",
+    "zh-Hant": "連線測試模型或推理參數與目前設定不一致。",
+    "en": "The test model or reasoning parameters conflict with the current configuration."
+  },
+  "reasoningDefaultOption": {
+    "en": "Use model default · {level}",
+    "zh-Hans": "使用模型默认值 · {level}",
+    "zh-Hant": "使用模型預設值 · {level}"
   }
 }

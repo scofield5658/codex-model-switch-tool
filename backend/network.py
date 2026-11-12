@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from .store import ConfigError, origin
+from .capabilities import effective_effort
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs): return None
@@ -57,7 +58,19 @@ def substitute(value,model):
 def health(p,key):
     h=p.get('extra',{}).get('health')
     if not h: raise ConfigError('未配置连接测试。')
-    status,raw,ms=request(p,key,h['path'],h.get('method','GET'),substitute(h.get('body'),p.get('model','')),h.get('timeoutSeconds',20))
+    body=substitute(h.get('body'),p.get('model',''))
+    if h.get('method','GET')=='POST' and endpoint(p['baseUrl'],h['path']).rstrip('/').endswith('/responses'):
+        effort=effective_effort(p['baseUrl'],p.get('model',''),p.get('extra',{}))
+        from .capabilities import capability
+        declared=capability(p['baseUrl'],p.get('model',''),p.get('extra',{}))
+        if declared is not None or effort is not None:
+            if not isinstance(body,dict) or body.get('model')!=p.get('model'):
+                raise ConfigError('连接测试模型或推理参数与当前配置不一致。')
+            reasoning=body.get('reasoning',{})
+            if not isinstance(reasoning,dict) or ('effort' in reasoning and reasoning['effort']!=effort):
+                raise ConfigError('连接测试模型或推理参数与当前配置不一致。')
+            if effort is not None: body['reasoning']={**reasoning,'effort':effort}
+    status,raw,ms=request(p,key,h['path'],h.get('method','GET'),body,h.get('timeoutSeconds',20))
     if status!=h.get('expectStatus',200): raise ConfigError('HTTP 状态与连接测试预期不符。')
     # A Responses error may be delivered with HTTP 200.
     try:

@@ -5,6 +5,7 @@ with tempfile.TemporaryDirectory() as td:
     root=Path(td)
     (root/'config.toml').write_text('model="gpt-test"\n[model_providers.demo]\nname="Demo"\nbase_url="https://example.com/v1"\nexperimental_bearer_token="fixture-key"\n')
     store=Store(root); data=store.snapshot()
+    data['providers'][0]['extra']['model_capabilities']={'fixture-model':{'reasoning_levels':['low','high','max'],'default_reasoning_level':'high'}}
     store.save({'revision':data['revision'],'providers':data['providers'],'selection':{'provider':'demo','model':'fixture-model'}})
     cli=os.environ.get('TEST_CODEX_BIN','codex')
     p=subprocess.Popen([cli,'app-server','--stdio'],env={**os.environ,'CODEX_HOME':td},stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True)
@@ -28,6 +29,9 @@ with tempfile.TemporaryDirectory() as td:
         assert 'result' in result,result
         models=result['result'].get('data',[])
         assert any(m.get('model')=='fixture-model' for m in models),result
-        print('Codex app-server accepted generated catalog and listed fixture-model.')
+        row=next(m for m in models if m.get('model')=='fixture-model')
+        assert [r['reasoningEffort'] for r in row['supportedReasoningEfforts']]==['low','high','max'],row
+        assert row['defaultReasoningEffort']=='high',row
+        print('Codex app-server accepted catalog: fixture-model supports low/high/max, default high.')
     finally:
         p.terminate();p.wait(timeout=10);sel.close()
