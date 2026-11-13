@@ -10,7 +10,7 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function baseline(data){saved=clone(data);draft=clone(data);deleted=[];raws={};dirty=false;results={};}
 function raw(p){return raws[p.id]??JSON.stringify(p.extra,null,2);}
 function parse(p){try{return {...p,extra:JSON.parse(raw(p))};}catch{throw new Error('Raw Data JSON 格式错误，请修正或重置。');}}
-function clearMessage(){notice='';failure='';}
+function clearMessage(){notice='';failure='';if(saved)delete saved.warnings;}
 function changed(p){
  dirty=true;clearMessage();delete results[p.id];syncToolbar();
  document.querySelector('#messages').replaceChildren();
@@ -28,12 +28,13 @@ function render(){
  el.innerHTML=`<main data-ui-revision="compact-20261112"><header><div><h1>${h("自定义模型配置")}</h1><p>${h("管理接入，选择下次启动使用的模型。")}</p></div><button id="reload" class="quiet">${h("重新加载")}</button></header>
  <section class="toolbar" ${a('aria-label','配置操作')}><span id="draft-state" aria-live="polite">${dirty?h('有未保存修改'):''}</span><div><button id="reset">${h("重置")}</button><button id="save">${h("保存")}</button><button id="restart" class="primary">${h(draft.canRestart===false?'saveManualRestart':'保存并重启')}</button></div></section>
  <section class="summary"><span>${h("已保存默认")}</span><strong>${esc(saved.selection.provider)} <small>${esc(saved.selection.model)}</small></strong><p>${h("当前运行模型待核实；保存后请重启，并在新聊天中验证。")}</p></section>
- <div id="messages">${failure?`<p role="alert" class="error">${h(failure)}</p>`:''}${notice?`<p role="status" class="notice">${h(notice)}</p>`:''}</div>
+ <div id="messages">${failure?`<p role="alert" class="error">${h(failure)}</p>`:''}${notice?`<p role="status" class="notice">${h(notice)}</p>`:''}${(saved?.warnings||[]).map(w=>`<p role="status" class="notice">${h(w)}</p>`).join('')}</div>
  <section class="providers" ${a('aria-label','提供商列表')}>
  <article class="provider native"><div class="card-head"><div><h2>${h("内置 GPT")}</h2><p>${draft.nativeModel?esc(draft.nativeModel):h('未记录原始配置')}</p></div><button id="native" ${!draft.nativeAvailable?'disabled':''} class="${draft.selection.provider==='openai'?'selected':''}">${h(draft.selection.provider==='openai'?'已选为默认':'设为默认')}</button></div></article>
  ${draft.providers.map(p=>card(p)).join('')}
  </section>
  <button id="add" class="add">${h("＋ 添加模型提供商")}</button>
+ <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description"><h2 id="delete-title">${h('deleteProviderTitle')}</h2><p id="delete-description"></p><p id="delete-reference" hidden>${h('deletionReferencesConfirm')}</p><p id="delete-selected" hidden>${h('deleteSelected')}</p><div class="dialog-actions"><button id="dismiss-delete" autofocus>${h('取消')}</button><button id="confirm-delete" class="danger">${h('confirmDelete')}</button></div></dialog>
  <dialog id="restart-dialog"><h2>${h("保存并重启 Codex")}</h2><p>${h("这会退出整个客户端。插件无法自动核实所有聊天的运行状态，请先结束各窗口中的任务。")}</p><p>${h("重启后请新建聊天验证。已有聊天可能仍保留原来的模型。")}</p><label class="check"><input type="checkbox" id="idle">${h("我已确认所有任务结束，可以重启")}</label><div class="dialog-actions"><button id="dismiss-restart">${h("取消")}</button><button id="confirm-restart" disabled class="primary">${h("确认保存并重启")}</button></div></dialog>
  <dialog id="add-dialog"><h2>${h("添加模型提供商")}</h2><label>${h("服务商模板")}<select id="template"><option value="" data-i18n="custom">${t('custom')}</option>${draft.templates.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select></label><label>${h("名称")}<input id="new-name" ${a('placeholder','例如：Kimi Code')}></label><label>Provider ID<input id="new-id" ${a('placeholder','小写字母、数字和连字符')}></label><p id="add-error" class="error" role="alert"></p><div class="dialog-actions"><button id="dismiss-add">${h("取消")}</button><button id="confirm-add" class="primary">${h("添加")}</button></div></dialog>
  </main>`;
@@ -72,8 +73,34 @@ function healthConfigured(p){try{return !!parse(p).extra.health;}catch{return fa
 function connectionHint(p){return healthConfigured(p)?'使用当前草稿；POST 测试可能消耗额度。':'未配置测试请求，可在高级配置中设置。';}
 function setBusy(value){busy=value;for(const b of el.querySelectorAll('button,input,select,textarea'))b.disabled=value||b.dataset.originalDisabled==='true';}
 async function run(fn){if(busy)return;clearMessage();busy=true;render();try{await fn();}catch(e){failure=e;}finally{busy=false;render();}}
+// Native confirm() can be suppressed by the host sandbox; use an in-page dialog.
+function showDeleteDialog(p){
+ const dialog=document.querySelector('#delete-dialog');
+ dialog.dataset.providerId=p.id;
+ setText(document.querySelector('#delete-description'),'deleteConfirm',{name:p.name});
+ document.querySelector('#delete-reference').hidden=!p.referencedElsewhere;
+ const selected=draft.selection.provider===p.id;
+ document.querySelector('#delete-selected').hidden=!selected;
+ document.querySelector('#confirm-delete').disabled=selected;
+ dialog.showModal();
+}
+function confirmDelete(){
+ if(busy)return;
+ const dialog=document.querySelector('#delete-dialog');
+ const p=draft.providers.find(p=>p.id===dialog.dataset.providerId);
+ if(!p)return;
+ if(draft.selection.provider===p.id){showDeleteDialog(p);return;}
+ dialog.close();
+ draft.providers=draft.providers.filter(x=>x.id!==p.id);
+ if(saved.providers.some(x=>x.id===p.id)&&!deleted.includes(p.id))deleted.push(p.id);
+ delete raws[p.id];delete results[p.id];
+ if(editing===p.id)editing=null;
+ dirty=true;clearMessage();render();
+}
 function bind(){
  for(const b of el.querySelectorAll('button,input,select,textarea'))b.dataset.originalDisabled=String(b.disabled);
+ document.querySelector('#dismiss-delete').onclick=()=>document.querySelector('#delete-dialog').close();
+ document.querySelector('#confirm-delete').onclick=confirmDelete;
  document.querySelector('#reload').onclick=()=>{if(dirty&&!confirm(t('reloadConfirm')))return;run(async()=>{baseline(await call('provider_read'));editing=null;notice='已重新加载。';});};
  document.querySelector('#native').onclick=()=>{draft.selection={provider:'openai',model:draft.nativeModel};dirty=true;render();};
  document.querySelector('#reset').onclick=()=>{draft=clone(saved);raws={};deleted=[];dirty=false;results={};if(!draft.providers.some(p=>p.id===editing))editing=null;clearMessage();render();};
@@ -110,7 +137,7 @@ function bind(){
    switch(b.dataset.action){
     case 'edit':editing=editing===p.id?null:p.id;render();break;
     case 'select':draft.selection={provider:p.id,model:p.model};dirty=true;render();break;
-    case 'delete':if(draft.selection.provider===p.id){failure='请先选择其他默认提供商，再删除此项。';render();break;}if(confirm(t('deleteConfirm',{name:p.name}))){draft.providers=draft.providers.filter(x=>x.id!==p.id);if(saved.providers.some(x=>x.id===p.id))deleted.push(p.id);dirty=true;render();}break;
+    case 'delete':showDeleteDialog(p);break;
     case 'models':refreshModels(p,b);break;
     case 'health':delete results[p.id];run(async()=>{try{const q=confirmOrigin(parse(p));const r=await call('provider_health',{provider:q});results[p.id]={ok:r.ok,error:message('healthFailed')};}catch(e){results[p.id]={ok:false,error:e};}});break;
     case 'health-template':try{const x=parse(p).extra;x.health={path:'responses',method:'POST',body:{model:'$model',input:'Reply with OK.',max_output_tokens:64},expectStatus:200,timeoutSeconds:20};raws[p.id]=JSON.stringify(x,null,2);changed(p);render();}catch(e){failure=e;render();}break;

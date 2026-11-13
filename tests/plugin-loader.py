@@ -1,5 +1,5 @@
 """Exercise the actual Codex plugin loader, not just the standalone MCP server."""
-import json,os,subprocess,tempfile,selectors,time
+import json,os,subprocess,tempfile,selectors,time,hashlib
 from pathlib import Path
 cli=os.environ.get('TEST_CODEX_BIN','codex')
 market=Path('release/local-marketplace').resolve()
@@ -36,7 +36,8 @@ with tempfile.TemporaryDirectory(prefix='switcher-loader-') as td:
         entry=next((t for t in (tools.values() if isinstance(tools,dict) else tools) if t.get('name')=='provider_manager'),None)
         assert entry is not None, 'Host did not load provider_manager: '+json.dumps(row,ensure_ascii=False)
         assert {'type':'global'} in entry['_meta']['openai/ui']['entrypoints']
-        assert entry['_meta']['ui']['resourceUri']=='ui://model-switcher/settings'
+        ui_hash=hashlib.sha256((market/'plugins/codex-model-switch-tool/dist/ui.html').read_bytes()).hexdigest()[:16]
+        assert entry['_meta']['ui']['resourceUri']==f'ui://model-switcher/settings-{ui_hash}.html'
         print('Host loaded provider_manager with global entrypoint and UI resource.')
     finally:
         p.terminate();p.wait(timeout=10);sel.close()

@@ -389,3 +389,35 @@ test('DeepSeek template keeps inputs blank and offers documented reasoning level
  await expect(card.locator('[data-action="health"]')).toBeDisabled();
  await page.getByRole('button',{name:'重置',exact:true}).click();
 });
+
+
+test('save shows retained-reference warning and clears it on reset', async({page})=>{
+ await page.goto('http://127.0.0.1:43187');
+ await page.route('**/api/provider_save',async route=>{
+  const response=await route.fetch();const json=await response.json();
+  json.data.warnings=['deletionReferencesRetained','deletionFilesRetained'];
+  await route.fulfill({json});
+ });
+ await page.getByRole('button',{name:'保存',exact:true}).click();
+ await expect(page.getByRole('status').filter({hasText:'其他配置仍引用'})).toBeVisible();
+ await expect(page.getByRole('status').filter({hasText:'部分插件文件'})).toBeVisible();
+ await page.getByRole('button',{name:'重置',exact:true}).click();
+ await expect(page.getByRole('status')).toHaveCount(0);
+});
+
+test('shared provider reference is explained before confirming deletion', async({page})=>{
+ await page.route('**/api/provider_read',async route=>{
+  const response=await route.fetch();const json=await response.json();
+  json.data.providers[0].referencedElsewhere=true;
+  await route.fulfill({json});
+ });
+ await page.goto('http://127.0.0.1:43187');
+ const cards=page.locator('.provider');
+ await expect(cards).toHaveCount(4);
+ const count=await cards.count();
+ await page.getByRole('button',{name:'删除',exact:true}).first().click();
+ const dialog=page.getByRole('dialog',{name:'删除提供商',exact:true});
+ await expect(dialog).toContainText('其他配置引用了此提供商');
+ await dialog.getByRole('button',{name:'取消',exact:true}).click();
+ await expect(cards).toHaveCount(count);
+});

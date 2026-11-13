@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import urlsplit
 import tomlkit
+from .artifacts import Artifacts, provider_references
 from .capabilities import LEVELS, capability, effective_effort, validate_capabilities
 
 if os.name == "nt":
@@ -166,7 +167,7 @@ class Store:
             catalog['models'].append(item)
         content=json.dumps(catalog,ensure_ascii=False,indent=2)
         path=self.dir/'generated'/(id+'-'+digest(content)[:16]+'.json')
-        atomic(path,content)
+        Artifacts(self.dir).write(path,content,id)
         return str(path)
     def _snapshot(self,text,doc,state):
         providers=[]
@@ -185,7 +186,7 @@ class Store:
             # Do not expose existing headers: may contain credentials under arbitrary names.
             suggested=DEFAULTS.get(id,('', '', ''))[2]
             model=doc.get('model','') if doc.get('model_provider','openai')==id else meta.get('model',suggested)
-            providers.append({'id':id,'name':p.get('name',id),'baseUrl':p.get('base_url',''),'model':model,'keyConfigured':bool(p.get('experimental_bearer_token') or p.get('env_key') or p.get('auth') or p.get('requires_openai_auth')),'authEditable':not bool(p.get('auth') or p.get('requires_openai_auth')),'extra':extra,'models':cached.get('models',[]),'modelsAt':cached.get('checkedAt'), 'authSource':'环境变量' if p.get('env_key') else '已保存凭证'})
+            providers.append({'id':id,'name':p.get('name',id),'baseUrl':p.get('base_url',''),'model':model,'keyConfigured':bool(p.get('experimental_bearer_token') or p.get('env_key') or p.get('auth') or p.get('requires_openai_auth')),'referencedElsewhere':id in provider_references({k:v for k,v in doc.items() if k!='model_provider'}, {id}),'authEditable':not bool(p.get('auth') or p.get('requires_openai_auth')),'extra':extra,'models':cached.get('models',[]),'modelsAt':cached.get('checkedAt'), 'authSource':'环境变量' if p.get('env_key') else '已保存凭证'})
         baseline=({k:doc[k] for k in TOP_KEYS if k in doc} if doc.get('model_provider','openai')=='openai' else state.get('native'))
         return {'revision':digest(text+'\0'+json.dumps(state,sort_keys=True)), 'providers':providers,
             'selection':{'provider':doc.get('model_provider','openai'),'model':doc.get('model','')},
@@ -219,7 +220,7 @@ class Store:
             headers=dict(old.get('http_headers',{}))
             headers.update(extra.get('provider',{}).get('http_headers',{}))
             if not credential and not any(re.search(r'auth|key|token',h,re.I) for h in headers): raise ConfigError('未配置可用 Key，或插件进程未读取到对应环境变量。')
-            return {'id':id,'baseUrl':url,'model':p.get('model',''),'extra':extra,'headers':headers},credential
+            return {'id':id,'baseUrl':url,'model':p.get('model',''),'extra':extra,'headers':headers,'_configured':id in doc.get('model_providers',{})},credential
     def _desktop_reasoning(self,doc,state,levels):
         key='enabled-reasoning-efforts'
         desktop=doc.get('desktop',{})
@@ -321,4 +322,14 @@ class Store:
             atomic(self.path,nexttext)
             atomic(self.statepath,json.dumps(state,ensure_ascii=False,indent=2))
             (self.dir/'transaction.json').unlink()
-            return self._snapshot(nexttext,doc,state)
+            result=self._snapshot(nexttext,doc,state)
+            if deleted:
+                # Cleanup is best effort and only follows a fully committed save.
+                try:
+                    if self.path.read_text(encoding='utf-8')==nexttext:
+                        result['warnings']=Artifacts(self.dir).cleanup(deleted,doc,state)
+                    else:
+                        result['warnings']=['deletionFilesRetained']
+                except (OSError, ValueError, RuntimeError):
+                    result['warnings']=['deletionFilesRetained']
+            return result

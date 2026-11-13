@@ -24,6 +24,7 @@ jobs:
       - run: uv sync --locked --managed-python --no-config
       - run: pnpm test
       - run: pnpm build
+      - run: node --test tests/ui-resource.test.mjs
       - run: node scripts/build.mjs --test-ui
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm exec playwright test

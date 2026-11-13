@@ -4,6 +4,7 @@ import {registerAppTool,registerAppResource,RESOURCE_MIME_TYPE} from '@modelcont
 import {z} from 'zod';
 import {spawn} from 'node:child_process';
 import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import path from 'node:path';
 import messages from './locales/messages.json';
 import {createPythonRuntime, pythonEnvironment} from './runtime/python.mjs';
@@ -28,15 +29,21 @@ async function backend(command,args={}){
 function result(data){return {content:[],structuredContent:data};}
 function handler(command){return async({payload}={})=>{try{return result(await backend(command,payload?JSON.parse(payload):{}));}catch(e){const code=messages[e.code]?e.code:(e instanceof SyntaxError?'requestJson':messageCodes.get(e.message)||'operationFailed');return {isError:true,structuredContent:{errorCode:code,errorParams:e.params||{}},content:[{type:'text',text:messages[code]['zh-Hans'].replace(/\{(\w+)\}/g,(_,key)=>String(e.params?.[key]??''))}]};}};}
 async function start(){
- const server=new McpServer({name:'codex-model-switch-tool',version:'0.1.5'});
- const uri='ui://model-switcher/settings';
+ const server=new McpServer({name:'codex-model-switch-tool',version:'0.1.6'});
+ // Resource identity must change with the UI, including same-version local rebuilds.
+ const html=readFileSync(path.join(root,'dist/ui.html'),'utf8');
+ const uiHash=createHash('sha256').update(html).digest('hex').slice(0,16);
+ const uri=`ui://model-switcher/settings-${uiHash}.html`;
  // Opening the page must not wait for a first-time Python download or configuration read.
  registerAppTool(server,'provider_manager',{title:'自定义模型配置',description:'打开本地自定义模型配置界面，配置地址、凭证和默认模型。已有密钥不向模型返回。',inputSchema:{},annotations:{readOnlyHint:true},_meta:{ui:{resourceUri:uri},'openai/ui':{entrypoints:[{type:'global'}]}}},async()=>result({}));
  registerAppTool(server,'provider_read',{title:'读取提供商配置',inputSchema:{},annotations:{readOnlyHint:true},_meta:{ui:{visibility:['app']}}},handler('snapshot'));
  for(const [name,command,title] of [['provider_save','save','保存配置'],['provider_models','discover','刷新模型'],['provider_health','health','测试连接'],['provider_restart','restart','重启 Codex']]){
   registerAppTool(server,name,{title,inputSchema:{payload:z.string().max(512000)},annotations:{readOnlyHint:command==='discover'||command==='health',destructiveHint:command==='restart',openWorldHint:command==='discover'||command==='health'},_meta:{ui:{visibility:['app']}}},handler(command));
  }
- registerAppResource(server,'provider-ui',uri,{},async()=>({contents:[{uri,mimeType:RESOURCE_MIME_TYPE,text:readFileSync(path.join(root,'dist/ui.html'),'utf8'),_meta:{ui:{prefersBorder:false,csp:{connectDomains:[],resourceDomains:[]}},'openai/ui':{preferredDisplayMode:'fullscreen',availableDisplayModes:['fullscreen','inline']}}}]}));
+ // Keep the old URI readable for existing chats; new entries advertise the content hash.
+ for(const [name,resourceUri] of [['provider-ui',uri],['provider-ui-legacy','ui://model-switcher/settings']]){
+  registerAppResource(server,name,resourceUri,{},async()=>({contents:[{uri:resourceUri,mimeType:RESOURCE_MIME_TYPE,text:html,_meta:{ui:{prefersBorder:false,csp:{connectDomains:[],resourceDomains:[]}},'openai/ui':{preferredDisplayMode:'fullscreen',availableDisplayModes:['fullscreen','inline']}}}]}));
+ }
  await server.connect(new StdioServerTransport());
 }
 start().catch(()=>{process.stderr.write('Model Switcher startup failed.\n');process.exitCode=1;});

@@ -788,5 +788,30 @@
     "en": "Use model default · {level}",
     "zh-Hans": "使用模型默认值 · {level}",
     "zh-Hant": "使用模型預設值 · {level}"
+  },
+  "deletionReferencesRetained": {
+    "en": "Saved. Other configuration still references the deleted provider. Those settings and related files were kept; review them manually.",
+    "zh-Hans": "已保存。其他配置仍引用已删除的提供商，相关设置和文件已保留，请手动核对。",
+    "zh-Hant": "已儲存。其他設定仍引用已刪除的提供商，相關設定和檔案已保留，請手動核對。"
+  },
+  "deletionFilesRetained": {
+    "en": "Saved. Some plugin files were kept because their ownership is unknown, they are referenced or changed, or cleanup could not be completed safely.",
+    "zh-Hans": "已保存。部分插件文件归属不明、仍被引用、已被修改或无法安全清理，因此已保留。",
+    "zh-Hant": "已儲存。部分外掛檔案歸屬不明、仍被引用、已被修改或無法安全清理，因此已保留。"
+  },
+  "deletionReferencesConfirm": {
+    "en": "Other configuration references this provider. Those references will not be changed automatically and may stop working after deletion.",
+    "zh-Hans": "其他配置引用了此提供商。删除后这些引用可能失效，插件不会自动修改它们。",
+    "zh-Hant": "其他設定引用了此提供商。刪除後這些引用可能失效，外掛不會自動修改它們。"
+  },
+  "deleteProviderTitle": {
+    "en": "Delete provider",
+    "zh-Hans": "删除提供商",
+    "zh-Hant": "刪除供應商"
+  },
+  "confirmDelete": {
+    "en": "Confirm deletion",
+    "zh-Hans": "确认删除",
+    "zh-Hant": "確認刪除"
   }
 }

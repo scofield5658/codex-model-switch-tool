@@ -1,8 +1,9 @@
 """One JSON command on stdin; one sanitized result on stdout."""
 import json
 import sys
-from .store import Store, ConfigError, atomic, digest
+from .store import Store, ConfigError, digest
 from .network import discover, health
+from .artifacts import Artifacts
 from .restart import schedule_restart
 
 def execute(command,args):
@@ -14,7 +15,10 @@ def execute(command,args):
         if command=='health': return health(p,key)
         result=discover(p,key)
         cache=store.dir/'catalogs'/(digest(p['id']+p['baseUrl']+key)+'.json')
-        atomic(cache,json.dumps(result,ensure_ascii=False))
+        with store.locked():
+            _,doc,_=store._read()
+            if p.get('_configured') and p['id'] not in doc.get('model_providers',{}): return result
+            Artifacts(store.dir).write(cache,json.dumps(result,ensure_ascii=False),p['id'])
         return result
     if command=='restart':
         if args.get('revision')!=store.snapshot()['revision']: raise ConfigError('配置已变化，请重新加载后再重启。')

@@ -60,6 +60,7 @@ codex plugin add codex-model-switch-tool@model-switch-plugin
 - Codex 配置：`~/.codex/config.toml`，或 `CODEX_HOME` 指定的位置。
 - 插件状态、模型缓存及备份：`~/.codex/model-switcher/`。
 - 密钥保存在本机 TOML 中，通过文件权限保护，不是 Keychain 加密存储。
+- 删除提供商并保存后，仅清理有归属记录、内容未变且未被当前配置、原生设置或备份引用的插件缓存与模型目录。旧版未记录归属的文件保留；`profiles`、外部环境变量和用户自建文件不自动修改。清理无法安全完成时保留文件并提示，不撤销已保存的配置。
 - 保存前自动备份。手动回滚时先退出 Codex，核对 `model-switcher/backups` 中对应的配置和状态文件，避免覆盖其他新增设置。
 
 ## 开发
@@ -80,6 +81,7 @@ pnpm package
 
 ```sh
 node tests/mcp-smoke.mjs
+node --test tests/ui-resource.test.mjs
 uv run --locked --managed-python --no-config python -m tests.codex-catalog
 node scripts/build.mjs --test-ui
 pnpm exec playwright install chromium

@@ -19,7 +19,9 @@ try{
  const result=await client.callTool({name:'provider_read',arguments:{}});
  assert(!JSON.stringify(result).includes('never-return-this'));
  assert.equal(result.structuredContent.providers[0].keyConfigured,true);
- const ui=await client.readResource({uri:'ui://model-switcher/settings'});
+ const uiUri=tools.tools.find(t=>t.name==='provider_manager')._meta.ui.resourceUri;
+ const ui=await client.readResource({uri:uiUri});
+ assert.equal((await client.readResource({uri:'ui://model-switcher/settings'})).contents[0].text,ui.contents[0].text);
  assert(ui.contents[0].text.includes('自定义模型配置'));
  assert((await readFile(home+'/config.toml','utf8')).includes('never-return-this'));
  const invalid=await client.callTool({name:'provider_save',arguments:{payload:'{invalid'}});
@@ -39,7 +41,7 @@ try{
  assert.equal(result.isError,true);
  assert.equal(result.structuredContent.errorCode,'uvMissing');
  assert(!JSON.stringify(result).includes(failedHome));
- assert((await failed.readResource({uri:'ui://model-switcher/settings'})).contents[0].text.includes('uvMissing'));
+ assert((await failed.readResource({uri:(await failed.listTools()).tools.find(t=>t.name==='provider_manager')._meta.ui.resourceUri})).contents[0].text.includes('uvMissing'));
  console.log('MCP reports missing uv with a sanitized error while preserving tool/UI discovery.');
 }finally{await failed.close();await rm(failedHome,{recursive:true,force:true});}
 
@@ -52,6 +54,6 @@ try{
  const result=await cold.callTool({name:'provider_manager',arguments:{}},undefined,{timeout:1500});
  assert(!result.isError);
  await assert.rejects(readFile(coldHome+'/uv-called'),{code:'ENOENT'});
- assert((await cold.readResource({uri:'ui://model-switcher/settings'})).contents[0].text.includes('自定义模型配置'));
+ assert((await cold.readResource({uri:(await cold.listTools()).tools.find(t=>t.name==='provider_manager')._meta.ui.resourceUri})).contents[0].text.includes('自定义模型配置'));
  console.log('Cold settings entry opens without waiting for Python or accessing configuration.');
 }finally{await cold.close();await rm(coldHome,{recursive:true,force:true});}
