@@ -36,8 +36,8 @@ DEFAULTS = {
     'deepseek': ('DeepSeek', 'https://api.deepseek.com', ''),
     'kimi-code-plan-cn': ('Kimi Code', 'https://api.kimi.com/coding/v1', 'k3'),
     'moonshotai-cn': ('Moonshot', 'https://api.moonshot.cn/v1', 'kimi-k3'),
-    'bigmodel-cn': ('BigModel（智谱中国）', 'https://open.bigmodel.cn/api/v1', ''),
-    'zai-coding-plan': ('Z.AI Coding Plan', 'https://api.z.ai/api/v1', 'glm-5.3'),
+    'bigmodel-cn': ('BigModel（智谱中国）', 'https://open.bigmodel.cn/api/paas/v4', ''),
+    'zai-coding-plan': ('Z.AI Coding Plan', 'https://api.z.ai/api/coding/paas/v4', 'glm-5.3'),
 }
 
 def digest(text):

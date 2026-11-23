@@ -365,7 +365,7 @@ test('BigModel is alongside existing templates and does not prefill a model',asy
  await page.locator('#template').selectOption('bigmodel-cn');
  await page.locator('#confirm-add').click();
  const card=page.locator('[data-id="bigmodel-cn"]');
- await expect(card.locator('[data-field="baseUrl"]')).toHaveValue('https://open.bigmodel.cn/api/v1');
+ await expect(card.locator('[data-field="baseUrl"]')).toHaveValue('https://open.bigmodel.cn/api/paas/v4');
  await expect(card.locator('[data-field="model"]')).toHaveValue('');
  await expect(card.locator('[data-reasoning="effort"]')).toBeDisabled();
  await card.locator('[data-field="model"]').fill('glm-5.3');

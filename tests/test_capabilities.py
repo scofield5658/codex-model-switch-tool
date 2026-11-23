@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from backend.capabilities import capability
 from backend.store import Store, ConfigError, validate_extra
 from backend.network import health
 
@@ -52,8 +53,21 @@ class CapabilityTests(unittest.TestCase):
             p['extra']['health']['body']['reasoning']={'effort':'none'}
             with self.assertRaises(ConfigError): health(p,'fixture')
             self.assertEqual(req.call_count,1)
-    def test_bigmodel_template(self):
-        self.assertIn('https://open.bigmodel.cn/api/v1',[t['baseUrl'] for t in self.store.snapshot()['templates']])
+    def test_glm_templates_and_legacy_urls_support_reasoning(self):
+        templates = {t['id']: t for t in self.store.snapshot()['templates']}
+        cases = (
+            ('bigmodel-cn', 'https://open.bigmodel.cn/api/paas/v4', 'https://open.bigmodel.cn/api/v1'),
+            ('zai-coding-plan', 'https://api.z.ai/api/coding/paas/v4', 'https://api.z.ai/api/v1'),
+        )
+        for provider, default_url, legacy_url in cases:
+            with self.subTest(provider=provider):
+                self.assertEqual(templates[provider]['baseUrl'], default_url)
+            for url in (default_url, legacy_url):
+                with self.subTest(url=url):
+                    self.assertEqual(capability(url, 'glm-5.3', {}), {
+                        'reasoning_levels': ['low', 'high', 'max'],
+                        'default_reasoning_level': 'max',
+                    })
 
     def test_desktop_visibility_restored_and_unrelated_fields_preserved(self):
         with (self.root/'config.toml').open('a') as f: f.write('\n[desktop]\nother=true\nenabled-reasoning-efforts=["medium"]\n')
